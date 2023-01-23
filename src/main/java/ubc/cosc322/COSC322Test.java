@@ -62,7 +62,7 @@ public class COSC322Test extends GamePlayer{
 
     @Override
     public void onLogin() {
-//    	System.out.println("Congratualations!!! "
+//    	System.out.println("Congratualations!! "
 //    			+ "I am called because the server indicated that the login is successfully");
 //    	System.out.println("The next step is to find a room and join it: "
 //    			+ "the gameClient instance created in my constructor knows how!");
