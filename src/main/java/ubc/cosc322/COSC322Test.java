@@ -1,12 +1,15 @@
 
 package ubc.cosc322;
 
+import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import sfs2x.client.entities.Room;
 import ygraph.ai.smartfox.games.BaseGameGUI;
 import ygraph.ai.smartfox.games.GameClient;
+import ygraph.ai.smartfox.games.GameMessage;
 import ygraph.ai.smartfox.games.GamePlayer;
 
 /**
@@ -85,8 +88,18 @@ public class COSC322Test extends GamePlayer{
 	
     	//For a detailed description of the message types and format, 
     	//see the method GamePlayer.handleGameMessage() in the game-client-api document.
-		System.out.println(messageType);
-		System.out.println(msgDetails);
+
+		switch (messageType) {
+			case GameMessage.GAME_STATE_BOARD:
+				getGameGUI().setGameState((ArrayList<Integer>) msgDetails.get("game-state"));
+				break;
+			case GameMessage.GAME_ACTION_MOVE:
+				getGameGUI().updateGameState(msgDetails);
+				break;
+			default:
+				System.out.println(messageType);
+				System.out.println(msgDetails);
+		}
     	return true;   	
     }
     
