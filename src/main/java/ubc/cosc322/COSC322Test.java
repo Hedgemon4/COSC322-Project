@@ -55,22 +55,27 @@ public class COSC322Test extends GamePlayer{
     	
     	//To make a GUI-based player, create an instance of BaseGameGUI
     	//and implement the method getGameGUI() accordingly
-    	//this.gamegui = new BaseGameGUI(this);
+    	this.gamegui = new BaseGameGUI(this);
     }
  
 
 
     @Override
     public void onLogin() {
-    	System.out.println("Congratualations!!! "
-    			+ "I am called because the server indicated that the login is successfully");
-    	System.out.println("The next step is to find a room and join it: "
-    			+ "the gameClient instance created in my constructor knows how!");
-		List<Room> rooms = this.gameClient.getRoomList();
-		for (Room room: rooms){
-			System.out.println(room.getName());
+//    	System.out.println("Congratualations!!! "
+//    			+ "I am called because the server indicated that the login is successfully");
+//    	System.out.println("The next step is to find a room and join it: "
+//    			+ "the gameClient instance created in my constructor knows how!");
+//		List<Room> rooms = this.gameClient.getRoomList();
+//		for (Room room: rooms){
+//			System.out.println(room.getName());
+//		}
+//		this.gameClient.joinRoom("Bear Lake");
+
+		userName = gameClient.getUserName();
+		if(gamegui != null) {
+			gamegui.setRoomInformation(gameClient.getRoomList());
 		}
-		this.gameClient.joinRoom("Bear Lake");
     }
 
     @Override
@@ -100,7 +105,7 @@ public class COSC322Test extends GamePlayer{
 	@Override
 	public BaseGameGUI getGameGUI() {
 		// TODO Auto-generated method stub
-		return  null;
+		return  this.gamegui;
 	}
 
 	@Override
