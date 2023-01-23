@@ -3,6 +3,7 @@ package ubc.cosc322;
 
 import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import ygraph.ai.smartfox.games.GamePlayer;
  * Jan 5, 2021
  *
  */
-public class COSC322Test extends GamePlayer{
+public class COSC322Test extends GamePlayer {
 
     private GameClient gameClient = null; 
     private BaseGameGUI gamegui = null;
@@ -65,16 +66,6 @@ public class COSC322Test extends GamePlayer{
 
     @Override
     public void onLogin() {
-//    	System.out.println("Congratualations!! "
-//    			+ "I am called because the server indicated that the login is successfully");
-//    	System.out.println("The next step is to find a room and join it: "
-//    			+ "the gameClient instance created in my constructor knows how!");
-//		List<Room> rooms = this.gameClient.getRoomList();
-//		for (Room room: rooms){
-//			System.out.println(room.getName());
-//		}
-//		this.gameClient.joinRoom("Bear Lake");
-
 		userName = gameClient.getUserName();
 		if(gamegui != null) {
 			gamegui.setRoomInformation(gameClient.getRoomList());
@@ -97,8 +88,7 @@ public class COSC322Test extends GamePlayer{
 				getGameGUI().updateGameState(msgDetails);
 				break;
 			default:
-				System.out.println(messageType);
-				System.out.println(msgDetails);
+				assert(false);
 		}
     	return true;   	
     }
