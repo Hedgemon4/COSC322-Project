@@ -1,12 +1,16 @@
 
 package ubc.cosc322;
 
+import java.sql.SQLOutput;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import sfs2x.client.entities.Room;
 import ygraph.ai.smartfox.games.BaseGameGUI;
 import ygraph.ai.smartfox.games.GameClient;
+import ygraph.ai.smartfox.games.GameMessage;
 import ygraph.ai.smartfox.games.GamePlayer;
 
 /**
@@ -15,7 +19,7 @@ import ygraph.ai.smartfox.games.GamePlayer;
  * Jan 5, 2021
  *
  */
-public class COSC322Test extends GamePlayer{
+public class COSC322Test extends GamePlayer {
 
     private GameClient gameClient = null; 
     private BaseGameGUI gamegui = null;
@@ -55,22 +59,17 @@ public class COSC322Test extends GamePlayer{
     	
     	//To make a GUI-based player, create an instance of BaseGameGUI
     	//and implement the method getGameGUI() accordingly
-    	//this.gamegui = new BaseGameGUI(this);
+    	this.gamegui = new BaseGameGUI(this);
     }
  
 
 
     @Override
     public void onLogin() {
-    	System.out.println("Congratualations!!! "
-    			+ "I am called because the server indicated that the login is successfully");
-    	System.out.println("The next step is to find a room and join it: "
-    			+ "the gameClient instance created in my constructor knows how!");
-		List<Room> rooms = this.gameClient.getRoomList();
-		for (Room room: rooms){
-			System.out.println(room.getName());
+		userName = gameClient.getUserName();
+		if(gamegui != null) {
+			gamegui.setRoomInformation(gameClient.getRoomList());
 		}
-		this.gameClient.joinRoom("Bear Lake");
     }
 
     @Override
@@ -80,8 +79,17 @@ public class COSC322Test extends GamePlayer{
 	
     	//For a detailed description of the message types and format, 
     	//see the method GamePlayer.handleGameMessage() in the game-client-api document.
-		System.out.println(messageType);
-		System.out.println(msgDetails);
+
+		switch (messageType) {
+			case GameMessage.GAME_STATE_BOARD:
+				getGameGUI().setGameState((ArrayList<Integer>) msgDetails.get("game-state"));
+				break;
+			case GameMessage.GAME_ACTION_MOVE:
+				getGameGUI().updateGameState(msgDetails);
+				break;
+			default:
+				assert(false);
+		}
     	return true;   	
     }
     
@@ -100,7 +108,7 @@ public class COSC322Test extends GamePlayer{
 	@Override
 	public BaseGameGUI getGameGUI() {
 		// TODO Auto-generated method stub
-		return  null;
+		return  this.gamegui;
 	}
 
 	@Override
