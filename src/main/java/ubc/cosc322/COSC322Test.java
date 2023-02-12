@@ -1,18 +1,18 @@
 
 package ubc.cosc322;
 
-import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import sfs2x.client.entities.Room;
+import State.State;
 import ygraph.ai.smartfox.games.BaseGameGUI;
 import ygraph.ai.smartfox.games.GameClient;
 import ygraph.ai.smartfox.games.GameMessage;
 import ygraph.ai.smartfox.games.GamePlayer;
+import ygraph.ai.smartfox.games.amazons.AmazonsGameMessage;
 import ygraph.ai.smartfox.games.amazons.HumanPlayer;
+
+import java.util.ArrayList;
+import java.util.Map;
+
+import State.*;
 
 /**
  * An example illustrating how to implement a GamePlayer
@@ -23,37 +23,36 @@ import ygraph.ai.smartfox.games.amazons.HumanPlayer;
 public class COSC322Test extends GamePlayer {
 
     private GameClient gameClient = null; 
-    private BaseGameGUI gamegui = null;
+    private final BaseGameGUI gamegui;
 	
-    private String userName = null;
-    private String passwd = null;
- 
-	
-    /**
+    private String userName;
+    private final String passwd;
+
+
+	/**
      * The main method
      * @param args for name and passwd (current, any string would work)
      */
-    public static void main(String[] args) {				 
-//    	COSC322Test player = new COSC322Test(args[0], args[1]);
-		HumanPlayer player = new HumanPlayer();
+    public static void main(String[] args) {
+		GamePlayer player;
+		if (args[2].equals("bot"))
+    		player = new COSC322Test(args[0], args[1]);
+		else
+			player = new HumanPlayer();
     	
     	if(player.getGameGUI() == null) {
     		player.Go();
     	}
     	else {
     		BaseGameGUI.sys_setup();
-            java.awt.EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                	player.Go();
-                }
-            });
+            java.awt.EventQueue.invokeLater(player::Go);
     	}
     }
 	
     /**
      * Any name and passwd 
-     * @param userName
-      * @param passwd
+     * @param userName Username of your choice
+      * @param passwd Password can be anything, isn't checked
      */
     public COSC322Test(String userName, String passwd) {
     	this.userName = userName;
@@ -74,7 +73,8 @@ public class COSC322Test extends GamePlayer {
 		}
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public boolean handleGameMessage(String messageType, Map<String, Object> msgDetails) {
     	//This method will be called by the GameClient when it receives a game-related message
     	//from the server.
@@ -84,9 +84,14 @@ public class COSC322Test extends GamePlayer {
 
 		switch (messageType) {
 			case GameMessage.GAME_ACTION_START:
-
+				// If we are black, we move first
+				boolean isBlack = msgDetails.get(AmazonsGameMessage.PLAYER_BLACK).equals(getGameClient().getUserName());
+				break;
 			case GameMessage.GAME_STATE_BOARD:
-				getGameGUI().setGameState((ArrayList<Integer>) msgDetails.get("game-state"));
+				getGameGUI().setGameState((ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.GAME_STATE));
+				State s = new State((ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.GAME_STATE));
+				System.out.println(s.boardToString());
+				System.out.println(ActionGenerator.generateActions(s, State.WHITE_QUEEN));
 				break;
 			case GameMessage.GAME_ACTION_MOVE:
 				getGameGUI().updateGameState(msgDetails);

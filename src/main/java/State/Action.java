@@ -3,6 +3,7 @@ package State;
 import ygraph.ai.smartfox.games.amazons.AmazonsGameMessage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 public class Action {
@@ -17,8 +18,8 @@ public class Action {
     }
 
     /**
-     * Converts a map to an action. Each action is 1 indexed and is converted to a 0 indexed action
-     * @param actionMap
+     * Converts a map to an action. Each action in the input is 1 indexed and is converted to a 0 indexed action internally
+     * @param actionMap The map returned by the server
      */
     @SuppressWarnings("unchecked")
     public Action(Map<String, Object> actionMap) {
@@ -32,6 +33,14 @@ public class Action {
         oldPos.set(1, oldPos.get(1) - 1);
         arrowPos.set(0, arrowPos.get(0) - 1);
         arrowPos.set(1, arrowPos.get(1) - 1);
+    }
+
+    Action(int oldX, int oldY, int newX, int newY, int arrowX, int arrowY) {
+        this(
+                new ArrayList<>(Arrays.asList(oldX, oldY)),
+                new ArrayList<>(Arrays.asList(newX, newY)),
+                new ArrayList<>(Arrays.asList(arrowX, arrowY))
+        );
     }
 
     public ArrayList<Integer> getOldPos() {
