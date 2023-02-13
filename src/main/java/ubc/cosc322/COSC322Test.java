@@ -91,7 +91,12 @@ public class COSC322Test extends GamePlayer {
 				getGameGUI().setGameState((ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.GAME_STATE));
 				State s = new State((ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.GAME_STATE));
 				System.out.println(s.boardToString());
-				System.out.println(ActionGenerator.generateActions(s, State.WHITE_QUEEN));
+				ArrayList<Action> actions = ActionGenerator.generateActions(s, State.WHITE_QUEEN);
+				System.out.println(actions);
+//				for (Action a : actions) {
+//					if (!ActionGenerator.validMove(s,a))
+//						System.out.println(a);
+//				}
 				break;
 			case GameMessage.GAME_ACTION_MOVE:
 				getGameGUI().updateGameState(msgDetails);
@@ -110,20 +115,17 @@ public class COSC322Test extends GamePlayer {
 
 	@Override
 	public GameClient getGameClient() {
-		// TODO Auto-generated method stub
 		return this.gameClient;
 	}
 
 	@Override
 	public BaseGameGUI getGameGUI() {
-		// TODO Auto-generated method stub
 		return  this.gamegui;
 	}
 
 	@Override
 	public void connect() {
-		// TODO Auto-generated method stub
-    	gameClient = new GameClient(userName, passwd, this);			
+    	gameClient = new GameClient(userName, passwd, this);
 	}
 
  
