@@ -79,7 +79,7 @@ public class Action {
      * Converts the action to a map that can be sent to the server
      * @return A map that can be sent to the server
      */
-    public Map<String, Object> toOneIndexedMap() {
+    public Map<String, Object> toServerResponse() {
         Map<String, Object> map = new HashMap<>();
         map.put(AmazonsGameMessage.QUEEN_POS_CURR, new ArrayList<>(Arrays.asList(oldPos.get(1) + 1, oldPos.get(0) + 1)));
         map.put(AmazonsGameMessage.QUEEN_POS_NEXT, new ArrayList<>(Arrays.asList(newPos.get(1) + 1, newPos.get(0) + 1)));

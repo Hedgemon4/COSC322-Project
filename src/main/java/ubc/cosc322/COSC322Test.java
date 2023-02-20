@@ -120,8 +120,8 @@ public class COSC322Test extends GamePlayer {
 		ArrayList<Action> actions = ActionGenerator.generateActions(state, isBlack ? State.BLACK_QUEEN : State.WHITE_QUEEN);
 		Action selectedAction = actions.get((int) (Math.random() * actions.size()));
 		state = new State(state, selectedAction);
-		getGameClient().sendMoveMessage(selectedAction.toOneIndexedMap());
-		getGameGUI().updateGameState(selectedAction.toOneIndexedMap());
+		getGameClient().sendMoveMessage(selectedAction.toServerResponse());
+		getGameGUI().updateGameState(selectedAction.toServerResponse());
 		long end = System.nanoTime();
 		System.out.println(state.boardToString());
 		System.out.println("Bot action: " + selectedAction);
