@@ -33,13 +33,13 @@ public class COSC322Test extends GamePlayer {
 
 
 	/**
-     * The main method
-     * @param args for name and passwd (current, any string would work)
+     * A test main method
+     * @param args Optional. If you want a bot, put a username and password (currently, any string would work), else don't put anything
      */
     public static void main(String[] args) {
 		GamePlayer player;
-		if (args[2].equals("bot"))
-    		player = new COSC322Test(args[0], args[1]);
+		if (args.length == 2)
+    		player = new COSC322Test(args[0] + "-" + ((int)(Math.random()*1000)), args[1]);
 		else
 			player = new HumanPlayer();
     	
