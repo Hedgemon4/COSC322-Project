@@ -63,6 +63,7 @@ public class ActionChecker {
         return true;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean inBounds(State state, ArrayList<Integer> position) {
         return position.get(0) >= 0 && position.get(0) < state.BOARD_SIZE &&
                 position.get(1) >= 0 && position.get(1) < state.BOARD_SIZE;

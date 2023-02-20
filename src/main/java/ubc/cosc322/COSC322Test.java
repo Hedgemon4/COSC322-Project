@@ -28,6 +28,9 @@ public class COSC322Test extends GamePlayer {
     private String userName;
     private final String passwd;
 
+	private State state;
+	private boolean isBlack;
+
 
 	/**
      * The main method
@@ -85,28 +88,45 @@ public class COSC322Test extends GamePlayer {
 		switch (messageType) {
 			case GameMessage.GAME_ACTION_START:
 				// If we are black, we move first
-				boolean isBlack = msgDetails.get(AmazonsGameMessage.PLAYER_BLACK).equals(getGameClient().getUserName());
+				isBlack = msgDetails.get(AmazonsGameMessage.PLAYER_BLACK).equals(getGameClient().getUserName());
+				if (isBlack)
+					makeRandomMove();
 				break;
 			case GameMessage.GAME_STATE_BOARD:
 				getGameGUI().setGameState((ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.GAME_STATE));
-				State s = new State((ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.GAME_STATE));
-				System.out.println(s.boardToString());
-				ArrayList<Action> actions = ActionGenerator.generateActions(s, State.WHITE_QUEEN);
-				System.out.println(actions);
-//				for (Action a : actions) {
-//					if (!ActionGenerator.validMove(s,a))
-//						System.out.println(a);
-//				}
+				state = new State((ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.GAME_STATE));
+				System.out.println(state.boardToString());
 				break;
 			case GameMessage.GAME_ACTION_MOVE:
 				getGameGUI().updateGameState(msgDetails);
+				Action a = new Action(msgDetails);
+				System.out.println("Opponent action: " + a);
+				if (!ActionChecker.validMove(state, a)) {
+					for (int i = 0; i < 10; i++) {
+						System.out.println("INVALID MOVE!");
+					}
+				}
+				state = new State(state, new Action(msgDetails));
+				makeRandomMove();
 				break;
 			default:
 				assert(false);
 		}
     	return true;   	
     }
-    
+
+	private void makeRandomMove() {
+		long start = System.nanoTime();
+		ArrayList<Action> actions = ActionGenerator.generateActions(state, isBlack ? State.BLACK_QUEEN : State.WHITE_QUEEN);
+		Action selectedAction = actions.get((int) (Math.random() * actions.size()));
+		state = new State(state, selectedAction);
+		getGameClient().sendMoveMessage(selectedAction.toOneIndexedMap());
+		getGameGUI().updateGameState(selectedAction.toOneIndexedMap());
+		long end = System.nanoTime();
+		System.out.println(state.boardToString());
+		System.out.println("Bot action: " + selectedAction);
+		System.out.printf("Time taken: %.1fms\n", (end - start) / 1000000.);
+	}
     
     @Override
     public String userName() {
