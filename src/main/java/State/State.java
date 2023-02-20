@@ -93,6 +93,8 @@ public class State implements Cloneable {
 
         for (int y = BOARD_SIZE - 1; y >= 0; y--) {
             for (int x = 0; x < BOARD_SIZE; x++) {
+                if (x == 0)
+                    out.append(String.format("%2d ", y + 1));
                 int tile = board[x][y];
                 switch (tile) {
                     case 0:
@@ -107,6 +109,7 @@ public class State implements Cloneable {
             }
             out.append("\n");
         }
+        out.append("   a b c d e f g h i j");
 
         return out.toString();
     }
