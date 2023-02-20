@@ -12,14 +12,6 @@ public class Action {
     private final ArrayList<Integer> newPos;
     private final ArrayList<Integer> arrowPos;
 
-    // Don't use this constructor, use the Map constructor instead
-    /*@Deprecated
-    public Action(ArrayList<Integer> oldQueenPos, ArrayList<Integer> newQueenPos, ArrayList<Integer> arrowPos) {
-        this.oldPos = oldQueenPos;
-        this.newPos = newQueenPos;
-        this.arrowPos = arrowPos;
-    }*/
-
     /**
      * Converts a map to an action. Each action in the input is 1 indexed and is converted to a 0 indexed action internally
      * @param actionMap The map returned by the server
