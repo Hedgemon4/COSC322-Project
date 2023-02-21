@@ -13,7 +13,7 @@ public class ActionChecker {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean validMove(State state, Action action) {
         // If any of the positions are out of bounds
-        if (!inBounds(state, action.getOldX(), action.getOldY()) || !inBounds(state, action.getNewX(), action.getNewY()) || !inBounds(state, action.getArrowX(), action.getArrowY()))
+        if (!inBounds(action.getOldX(), action.getOldY()) || !inBounds(action.getNewX(), action.getNewY()) || !inBounds(action.getArrowX(), action.getArrowY()))
             return false;
 
         // If the oldPos wasn't a queen
@@ -64,7 +64,7 @@ public class ActionChecker {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private static boolean inBounds(State state, int x, int y) {
+    private static boolean inBounds(int x, int y) {
         return x >= 0 && x < State.BOARD_SIZE &&
                 y >= 0 && y < State.BOARD_SIZE;
     }
