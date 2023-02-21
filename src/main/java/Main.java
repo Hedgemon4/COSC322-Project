@@ -31,19 +31,19 @@ public class Main extends GamePlayer {
 
     /**
      * A test main method
+     *
      * @param args Optional. If you want a bot, put a username and password (currently, any string would work), else don't put anything
      */
     public static void main(String[] args) {
         GamePlayer player;
         if (args.length == 2)
-            player = new Main(args[0] + "-" + ((int)(Math.random()*1000)), args[1]);
+            player = new Main(args[0] + "-" + ((int) (Math.random() * 1000)), args[1]);
         else
             player = new HumanPlayer();
 
-        if(player.getGameGUI() == null) {
+        if (player.getGameGUI() == null) {
             player.Go();
-        }
-        else {
+        } else {
             BaseGameGUI.sys_setup();
             java.awt.EventQueue.invokeLater(player::Go);
         }
@@ -51,8 +51,9 @@ public class Main extends GamePlayer {
 
     /**
      * Any name and passwd
+     *
      * @param userName Username of your choice
-     * @param passwd Password can be anything, isn't checked
+     * @param passwd   Password can be anything, isn't checked
      */
     public Main(String userName, String passwd) {
         this.userName = userName;
@@ -64,11 +65,10 @@ public class Main extends GamePlayer {
     }
 
 
-
     @Override
     public void onLogin() {
         userName = gameClient.getUserName();
-        if(gamegui != null) {
+        if (gamegui != null) {
             gamegui.setRoomInformation(gameClient.getRoomList());
         }
     }
@@ -110,7 +110,7 @@ public class Main extends GamePlayer {
                 makeMove();
                 break;
             default:
-                assert(false);
+                assert (false);
         }
         return true;
     }
@@ -122,7 +122,7 @@ public class Main extends GamePlayer {
 
     private void makeMonteCarloMove() {
         long start = System.currentTimeMillis();
-        monteCarloTree.setRoot(new Node(state, colour, depth));
+        monteCarloTree = new MonteCarloTree(state, cValue, colour, depth);
         Action definitelyTheBestAction = monteCarloTree.search();
 
         state = new State(state, definitelyTheBestAction);
@@ -161,7 +161,7 @@ public class Main extends GamePlayer {
 
     @Override
     public BaseGameGUI getGameGUI() {
-        return  this.gamegui;
+        return this.gamegui;
     }
 
     @Override

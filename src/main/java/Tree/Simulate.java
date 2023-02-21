@@ -17,7 +17,6 @@ public class Simulate {
     }
 
     /**
-     *
      * @param node
      * @return The result from a completely random playout of moves
      */
@@ -38,7 +37,7 @@ public class Simulate {
 
     private static int earlyTerminationPlayout(Node node) {
         int i = 0;
-        final int TERMINATION_DEPTH = 30;
+        final int TERMINATION_DEPTH = 35;
         State state = new State(node.getState(), node.getAction());
         int color = node.getColour();
         int depth = node.getDepth();
@@ -47,13 +46,13 @@ public class Simulate {
         while (actions.size() != 0 && i < TERMINATION_DEPTH) {
             selectedAction = actions.get((int) (Math.random() * actions.size()));
             state = new State(state, selectedAction);
-            color = color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
+            color = (color == State.BLACK_QUEEN) ? State.WHITE_QUEEN : State.BLACK_QUEEN;
             actions = ActionGenerator.generateActions(state, color, ++depth);
             i++;
         }
-        if(i < TERMINATION_DEPTH)
+        if (i < TERMINATION_DEPTH)
             return color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
-        else{
+        else {
             int blackControl = boardControlHeuristic(state, State.BLACK_QUEEN);
             int whiteControl = boardControlHeuristic(state, State.WHITE_QUEEN);
             if (blackControl == whiteControl)
@@ -135,8 +134,8 @@ public class Simulate {
             }
         }
         int control = 0;
-        for (int i = 0; i < 10; i++){
-            for (int j = 0; j < 10; j++){
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
                 control += board[i][j];
             }
         }

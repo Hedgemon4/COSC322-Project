@@ -43,7 +43,7 @@ public class MonteCarloTree {
      * We now use the result of the simulation to update all the search tree nodes going up to the root.
      *
      * @param result The player that won. Either State.BLACK or State.WHITE
-     * @param child The child node that was just simulated
+     * @param child  The child node that was just simulated
      */
     public void backPropagate(int result, Node child) {
         if (child.getColour() == result) {
