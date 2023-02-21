@@ -8,7 +8,7 @@ public class State implements Cloneable {
     private int[][] blackQueens;
     private int[][] whiteQueens;
 
-    public final int BOARD_SIZE = 10;
+    public static final int BOARD_SIZE = 10;
     public static final int WHITE_QUEEN = 2;
     public static final int BLACK_QUEEN = 1;
     public static final int ARROW = 3;
@@ -69,7 +69,7 @@ public class State implements Cloneable {
         }
     }
 
-    int[][] getQueens(int color) {
+    public int[][] getQueens(int color) {
         if (color == BLACK_QUEEN)
             return blackQueens;
         else if (color == WHITE_QUEEN)
