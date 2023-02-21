@@ -38,19 +38,20 @@ public class Simulate {
 
     private static int earlyTerminationPlayout(Node node) {
         int i = 0;
+        final int TERMINATION_DEPTH = 30;
         State state = new State(node.getState(), node.getAction());
         int color = node.getColour();
         int depth = node.getDepth();
         ArrayList<Action> actions = ActionGenerator.generateActions(state, color, depth);
         Action selectedAction;
-        while (actions.size() != 0 && i < 30) {
+        while (actions.size() != 0 && i < TERMINATION_DEPTH) {
             selectedAction = actions.get((int) (Math.random() * actions.size()));
             state = new State(state, selectedAction);
             color = color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
             actions = ActionGenerator.generateActions(state, color, ++depth);
             i++;
         }
-        if(i < 25)
+        if(i < TERMINATION_DEPTH)
             return color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
         else{
             int blackControl = boardControlHeuristic(state, State.BLACK_QUEEN);
