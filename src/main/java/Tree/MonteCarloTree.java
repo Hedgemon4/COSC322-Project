@@ -85,6 +85,8 @@ public class MonteCarloTree {
         Node bestChild = null;
         double bestValue = -1;
         for (Node child : n.getChildren()) {
+            if (child == null)
+                continue;
             double val = UCBEquation(child);
             if (val > bestValue) {
                 bestValue = val;
