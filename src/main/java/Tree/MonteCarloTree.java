@@ -13,18 +13,16 @@ public class MonteCarloTree {
 
     public Action search() {
         Node tree = root;
-        Timer time = new Timer(29);
+        Timer time = new Timer(29.5);
         int runCount = 0;
         while (time.timeLeft()) {
-            System.out.println(1);
+            runCount++;
             Node leaf = select(tree);
-            System.out.println(2);
             Node child = expand(leaf);
-            System.out.println(3);
             int result = Simulate.simulate(child);
-            System.out.println(4);
             backPropagate(result, child);
         }
+        System.out.println("Ran " + runCount + " times");
         System.out.println("Made it here");
         return mostVisitedNode().getAction();
     }
@@ -46,26 +44,35 @@ public class MonteCarloTree {
      * We now use the result of the simulation to update all the search tree nodes going up to the root.
      *
      * @param result The player that won. Either State.BLACK or State.WHITE
-     * @param child
+     * @param child The child node that was just simulated
      */
     public void backPropagate(int result, Node child) {
-        do {
+        if (child.getColour() == result) {
+            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+            child.setTotalWins(child.getTotalWins() + 1);
+        } else {
+            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+        }
+
+        while (child.getParent() != null) {
+            child = child.getParent();
             if (child.getColour() == result) {
                 child.setTotalPlayouts(child.getTotalPlayouts() + 1);
                 child.setTotalWins(child.getTotalWins() + 1);
             } else {
                 child.setTotalPlayouts(child.getTotalPlayouts() + 1);
             }
-            child = child.getParent();
         }
-        while (child.getParent() != null);
     }
 
     private Node mostVisitedNode() {
         Node bestNode = null;
         int bestCount = -1;
 
-        for (Node child : getRoot().getChildren()) {
+        Node[] children = getRoot().getChildren();
+        for (Node child : children) {
+            if (child == null)
+                continue;
             if (child.getTotalPlayouts() > bestCount) {
                 bestNode = child;
                 bestCount = child.getTotalPlayouts();

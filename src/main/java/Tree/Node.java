@@ -81,6 +81,7 @@ public class Node {
     }
 
     public Node[] getChildren() {
+
         return children;
     }
 

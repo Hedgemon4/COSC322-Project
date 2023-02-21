@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public class State implements Cloneable {
     // 0 = empty, 1 = black queen, 2 = white queen, 3 = arrow
     private byte[][] board;
-    private final int[][] blackQueens;
-    private final int[][] whiteQueens;
+    private int[][] blackQueens;
+    private int[][] whiteQueens;
 
     public final int BOARD_SIZE = 10;
     public static final int WHITE_QUEEN = 2;
@@ -84,7 +84,22 @@ public class State implements Cloneable {
 
     public Object clone() throws CloneNotSupportedException {
         State clone = (State) super.clone();
-        clone.board = this.board.clone();
+
+        clone.board = new byte[this.board.length][];
+        for (int i = 0; i < this.board.length; i++) {
+            clone.board[i] = this.board[i].clone();
+        }
+
+        clone.blackQueens = new int[this.blackQueens.length][];
+        for (int i = 0; i < clone.blackQueens.length; i++) {
+            clone.blackQueens[i] = this.blackQueens[i].clone();
+        }
+
+        clone.whiteQueens = new int[this.whiteQueens.length][];
+        for (int i = 0; i < clone.whiteQueens.length; i++) {
+            clone.whiteQueens[i] = this.whiteQueens[i].clone();
+        }
+
         return clone;
     }
 

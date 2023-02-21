@@ -1,8 +1,8 @@
 package Tree;
 
-import State.*;
-
-import java.util.ArrayList;
+import State.Action;
+import State.ActionGenerator;
+import State.State;
 
 public class ExpansionPolicy {
     public static Node expansionNode(Node node) {
@@ -13,7 +13,6 @@ public class ExpansionPolicy {
         int randomInt = (int) (Math.random() * node.getPossibleActions().length);
         while(node.getChildren()[randomInt] != null) {
             randomInt = (int) (Math.random() * node.getPossibleActions().length);
-            System.out.println(node.getState().boardToString());
         }
         Action randomAction = node.getPossibleActions()[randomInt];
         State state = new State(node.getState(), randomAction);
