@@ -86,7 +86,7 @@ public class ActionGenerator {
             ArrayList<Action> out = new ArrayList<>();
             if (color == State.BLACK_QUEEN) {
                 for (Action action : moves)
-                    if (action.getArrowPos().get(1) <= 4)
+                    if (action.getArrowY() <= 4)
                         out.add(action);
             } else {
                 for (Action action : moves)
