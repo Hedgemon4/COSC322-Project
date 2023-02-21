@@ -14,14 +14,18 @@ public class MonteCarloTree {
     public Action search() {
         Node tree = root;
         Timer time = new Timer(29);
-
+        int runCount = 0;
         while (time.timeLeft()) {
+            System.out.println(1);
             Node leaf = select(tree);
+            System.out.println(2);
             Node child = expand(leaf);
+            System.out.println(3);
             int result = Simulate.simulate(child);
+            System.out.println(4);
             backPropagate(result, child);
         }
-
+        System.out.println("Made it here");
         return mostVisitedNode().getAction();
     }
 

@@ -11,8 +11,10 @@ public class ExpansionPolicy {
 
     private static Node randomExpansion(Node node) {
         int randomInt = (int) (Math.random() * node.getPossibleActions().length);
-        while(node.getChildren()[randomInt] != null)
+        while(node.getChildren()[randomInt] != null) {
             randomInt = (int) (Math.random() * node.getPossibleActions().length);
+            System.out.println(node.getState().boardToString());
+        }
         Action randomAction = node.getPossibleActions()[randomInt];
         State state = new State(node.getState(), randomAction);
         int colour =  node.getColour() == State.BLACK_QUEEN ? State.WHITE_QUEEN: State.BLACK_QUEEN;

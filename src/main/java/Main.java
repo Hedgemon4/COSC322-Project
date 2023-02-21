@@ -119,9 +119,10 @@ public class Main extends GamePlayer {
 
     private void makeMonteCarloMove() {
         long start = System.currentTimeMillis();
-        monteCarloTree.setRoot(new Node());
+        monteCarloTree.setRoot(new Node(state, colour));
         Action definitelyTheBestAction = monteCarloTree.search();
 
+        state = new State(state, definitelyTheBestAction);
         getGameClient().sendMoveMessage(definitelyTheBestAction.toServerResponse());
         getGameGUI().updateGameState(definitelyTheBestAction.toServerResponse());
 
