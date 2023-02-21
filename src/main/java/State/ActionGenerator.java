@@ -3,7 +3,7 @@ package State;
 import java.util.ArrayList;
 
 public class ActionGenerator {
-    private static final int STARTING_MOVES_DEPTH = 10;
+    private static final int STARTING_MOVES_DEPTH = 5;
 
     /**
      * This method finds all positions that each queen could go to, then calls a subroutine to generate all the arrow moves from each of those queen moves.
@@ -84,11 +84,19 @@ public class ActionGenerator {
 
         if (depth <= STARTING_MOVES_DEPTH) {
             ArrayList<Action> out = new ArrayList<>();
-            for (Action action : moves) {
-//                if (action.getArrowPos().get(1) > )
+            if (color == State.BLACK_QUEEN) {
+                for (Action action : moves)
+                    if (action.getArrowPos().get(1) <= 4)
+                        out.add(action);
+            } else {
+                for (Action action : moves)
+                    if (action.getArrowPos().get(1) >= 5)
+                        out.add(action);
             }
-            return null;
+            System.out.println("PRUNED: " + (moves.size() - out.size()) + " moves");
+            return out;
         } else {
+            System.out.println("NOT PRUNED");
             return moves;
         }
     }
