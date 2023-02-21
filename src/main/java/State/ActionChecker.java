@@ -1,6 +1,5 @@
 package State;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class ActionChecker {
@@ -11,30 +10,31 @@ public class ActionChecker {
      * @param action The Action to validate
      * @return if the action is valid
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean validMove(State state, Action action) {
         // If any of the positions are out of bounds
-        if (!inBounds(state, action.getOldPos()) || !inBounds(state, action.getNewPos()) || !inBounds(state, action.getArrowPos()))
+        if (!inBounds(state, action.getOldX(), action.getOldY()) || !inBounds(state, action.getNewX(), action.getNewY()) || !inBounds(state, action.getArrowX(), action.getArrowY()))
             return false;
 
         // If the oldPos wasn't a queen
-        if (state.getPos(action.getOldPos().get(0), action.getOldPos().get(1)) != 1 && state.getPos(action.getOldPos().get(0), action.getOldPos().get(1)) != 2)
+        if (state.getPos(action.getOldX(), action.getOldY()) != 1 && state.getPos(action.getOldX(), action.getOldY()) != 2)
             return false;
 
         // If the spot where the new queen or the arrow went is occupied
-        if (state.getPos(action.getNewPos().get(0), action.getNewPos().get(1)) != 0 || (state.getPos(action.getArrowPos().get(0), action.getArrowPos().get(1)) != 0 && !(Objects.equals(action.getArrowPos().get(0), action.getOldPos().get(0)) && Objects.equals(action.getArrowPos().get(1), action.getOldPos().get(1)))))
+        if (state.getPos(action.getNewX(), action.getNewY()) != 0 || (state.getPos(action.getArrowX(), action.getArrowY()) != 0 && !(Objects.equals(action.getArrowX(), action.getOldX()) && Objects.equals(action.getArrowY(), action.getOldY()))))
             return false;
 
-        int xDirection = action.getNewPos().get(0) - action.getOldPos().get(0);
-        int yDirection = action.getNewPos().get(1) - action.getOldPos().get(1);
+        int xDirection = action.getNewX() - action.getOldX();
+        int yDirection = action.getNewY() - action.getOldY();
         // Normalize directions
         if (xDirection != 0) xDirection /= Math.abs(xDirection);
         if (yDirection != 0) yDirection /= Math.abs(yDirection);
 
-        int checkX = action.getOldPos().get(0) + xDirection;
-        int checkY = action.getOldPos().get(1) + yDirection;
+        int checkX = action.getOldX() + xDirection;
+        int checkY = action.getOldY() + yDirection;
 
         // If there was a piece between the old and new queen position
-        while (!((xDirection != 0 && checkX == action.getNewPos().get(0)) || (yDirection != 0 && checkY == action.getNewPos().get(1)))) {
+        while (!((xDirection != 0 && checkX == action.getNewX()) || (yDirection != 0 && checkY == action.getNewY()))) {
             if (state.getPos(checkX, checkY) != 0)
                 return false;
             checkX += xDirection;
@@ -42,19 +42,19 @@ public class ActionChecker {
         }
 
         // If the new position was not in a valid direction from the old position
-        if (checkX != action.getNewPos().get(0) || checkY != action.getNewPos().get(1))
+        if (checkX != action.getNewX() || checkY != action.getNewY())
             return false;
 
         // Find direction of arrow from the new pos
-        xDirection = action.getArrowPos().get(0) - action.getNewPos().get(0);
-        yDirection = action.getArrowPos().get(1) - action.getNewPos().get(1);
+        xDirection = action.getArrowX() - action.getNewX();
+        yDirection = action.getArrowY() - action.getNewY();
         // Normalize directions
         if (xDirection != 0) xDirection /= Math.abs(xDirection);
         if (yDirection != 0) yDirection /= Math.abs(yDirection);
 
         // If there was a piece between the new pos and the arrow that isn't just the old piece
-        while (checkX != action.getNewPos().get(0) && checkY != action.getNewPos().get(1)) {
-            if (state.getPos(checkX, checkY) != 0 && !(checkX == action.getOldPos().get(0) && checkY == action.getOldPos().get(1)))
+        while (checkX != action.getNewX() && checkY != action.getNewY()) {
+            if (state.getPos(checkX, checkY) != 0 && !(checkX == action.getOldX() && checkY == action.getOldY()))
                 return false;
             checkX += xDirection;
             checkY += yDirection;
@@ -64,8 +64,8 @@ public class ActionChecker {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private static boolean inBounds(State state, ArrayList<Integer> position) {
-        return position.get(0) >= 0 && position.get(0) < state.BOARD_SIZE &&
-                position.get(1) >= 0 && position.get(1) < state.BOARD_SIZE;
+    private static boolean inBounds(State state, int x, int y) {
+        return x >= 0 && x < State.BOARD_SIZE &&
+                y >= 0 && y < State.BOARD_SIZE;
     }
 }

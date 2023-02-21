@@ -8,7 +8,7 @@ public class State implements Cloneable {
     private int[][] blackQueens;
     private int[][] whiteQueens;
 
-    public final int BOARD_SIZE = 10;
+    public static final int BOARD_SIZE = 10;
     public static final int WHITE_QUEEN = 2;
     public static final int BLACK_QUEEN = 1;
     public static final int ARROW = 3;
@@ -42,23 +42,23 @@ public class State implements Cloneable {
             blackQueens = cloned.blackQueens;
             whiteQueens = cloned.whiteQueens;
 
-            byte movingQueen = board[action.getOldPos().get(0)][action.getOldPos().get(1)];
-            board[action.getNewPos().get(0)][action.getNewPos().get(1)] = movingQueen;
-            board[action.getOldPos().get(0)][action.getOldPos().get(1)] = 0;
-            board[action.getArrowPos().get(0)][action.getArrowPos().get(1)] = 3;
+            byte movingQueen = board[action.getOldX()][action.getOldY()];
+            board[action.getNewX()][action.getNewY()] = movingQueen;
+            board[action.getOldX()][action.getOldY()] = 0;
+            board[action.getArrowX()][action.getArrowY()] = 3;
 
             // Update the queen that moved
             if (movingQueen == BLACK_QUEEN) {
                 for (int i = 0; i < blackQueens.length; i++) {
-                    if (blackQueens[i][0] == action.getOldPos().get(0) && blackQueens[i][1] == action.getOldPos().get(1)) {
-                        blackQueens[i] = new int[]{action.getNewPos().get(0), action.getNewPos().get(1)};
+                    if (blackQueens[i][0] == action.getOldX() && blackQueens[i][1] == action.getOldY()) {
+                        blackQueens[i] = new int[]{action.getNewX(), action.getNewY()};
                         break;
                     }
                 }
             } else {
                 for (int i = 0; i < whiteQueens.length; i++) {
-                    if (whiteQueens[i][0] == action.getOldPos().get(0) && whiteQueens[i][1] == action.getOldPos().get(1)) {
-                        whiteQueens[i] = new int[]{action.getNewPos().get(0), action.getNewPos().get(1)};
+                    if (whiteQueens[i][0] == action.getOldX() && whiteQueens[i][1] == action.getOldY()) {
+                        whiteQueens[i] = new int[]{action.getNewX(), action.getNewY()};
                         break;
                     }
                 }
@@ -69,7 +69,7 @@ public class State implements Cloneable {
         }
     }
 
-    int[][] getQueens(int color) {
+    public int[][] getQueens(int color) {
         if (color == BLACK_QUEEN)
             return blackQueens;
         else if (color == WHITE_QUEEN)
