@@ -23,7 +23,6 @@ public class MonteCarloTree {
             backPropagate(result, child);
         }
         System.out.println("Ran " + runCount + " times");
-        System.out.println("Made it here");
         return mostVisitedNode().getAction();
     }
 

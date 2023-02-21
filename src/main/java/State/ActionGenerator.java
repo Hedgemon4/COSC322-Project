@@ -3,7 +3,7 @@ package State;
 import java.util.ArrayList;
 
 public class ActionGenerator {
-    private static final int STARTING_MOVES_DEPTH = 10;
+    private static final int STARTING_MOVES_DEPTH = 5;
 
     /**
      * This method finds all positions that each queen could go to, then calls a subroutine to generate all the arrow moves from each of those queen moves.
@@ -17,7 +17,7 @@ public class ActionGenerator {
         int[][] queenPos = state.getQueens(color);
         for (int[] oldPos : queenPos) {
             // Up
-            for (int y = oldPos[1] + 1; y < state.BOARD_SIZE; y++) {
+            for (int y = oldPos[1] + 1; y < State.BOARD_SIZE; y++) {
                 if (state.getPos(oldPos[0], y) == 0)
                     moves.addAll(getActionsFromNewQueenPos(oldPos[0], oldPos[1], oldPos[0], y, state));
                 else
@@ -41,7 +41,7 @@ public class ActionGenerator {
             }
 
             // Right
-            for (int x = oldPos[0] + 1; x < state.BOARD_SIZE; x++) {
+            for (int x = oldPos[0] + 1; x < State.BOARD_SIZE; x++) {
                 if (state.getPos(x, oldPos[1]) == 0)
                     moves.addAll(getActionsFromNewQueenPos(oldPos[0], oldPos[1], x, oldPos[1], state));
                 else
@@ -49,7 +49,7 @@ public class ActionGenerator {
             }
 
             // Up right
-            for (int offset = 1; offset <= Math.min(state.BOARD_SIZE - 1 - oldPos[0], state.BOARD_SIZE - 1 - oldPos[1]); offset++) {
+            for (int offset = 1; offset <= Math.min(State.BOARD_SIZE - 1 - oldPos[0], State.BOARD_SIZE - 1 - oldPos[1]); offset++) {
                 if (state.getPos(oldPos[0] + offset, oldPos[1] + offset) == 0)
                     moves.addAll(getActionsFromNewQueenPos(oldPos[0], oldPos[1], oldPos[0] + offset, oldPos[1] + offset, state));
                 else
@@ -57,7 +57,7 @@ public class ActionGenerator {
             }
 
             // Up Left
-            for (int offset = 1; offset <= Math.min(oldPos[0], state.BOARD_SIZE - 1 - oldPos[1]); offset++) {
+            for (int offset = 1; offset <= Math.min(oldPos[0], State.BOARD_SIZE - 1 - oldPos[1]); offset++) {
                 if (state.getPos(oldPos[0] - offset, oldPos[1] + offset) == 0)
                     moves.addAll(getActionsFromNewQueenPos(oldPos[0], oldPos[1], oldPos[0] - offset, oldPos[1] + offset, state));
                 else
@@ -74,7 +74,7 @@ public class ActionGenerator {
             }
 
             // Down right
-            for (int offset = 1; offset <= Math.min(state.BOARD_SIZE - 1 - oldPos[0], oldPos[1]); offset++) {
+            for (int offset = 1; offset <= Math.min(State.BOARD_SIZE - 1 - oldPos[0], oldPos[1]); offset++) {
                 if (state.getPos(oldPos[0] + offset, oldPos[1] - offset) == 0)
                     moves.addAll(getActionsFromNewQueenPos(oldPos[0], oldPos[1], oldPos[0] + offset, oldPos[1] - offset, state));
                 else
@@ -84,10 +84,16 @@ public class ActionGenerator {
 
         if (depth <= STARTING_MOVES_DEPTH) {
             ArrayList<Action> out = new ArrayList<>();
-            for (Action action : moves) {
-//                if (action.getArrowPos().get(1) > )
+            if (color == State.BLACK_QUEEN) {
+                for (Action action : moves)
+                    if (action.getArrowPos().get(1) <= 4)
+                        out.add(action);
+            } else {
+                for (Action action : moves)
+                    if (action.getArrowY() >= 5)
+                        out.add(action);
             }
-            return null;
+            return out;
         } else {
             return moves;
         }
@@ -97,7 +103,7 @@ public class ActionGenerator {
         ArrayList<Action> moves = new ArrayList<>();
 
         // Up
-        for (int y = newY + 1; y < state.BOARD_SIZE; y++) {
+        for (int y = newY + 1; y < State.BOARD_SIZE; y++) {
             if ((newX == oldX && y == oldY) || state.getPos(newX, y) == 0)
                 moves.add(new Action(oldX, oldY, newX, newY, newX, y));
             else
@@ -121,7 +127,7 @@ public class ActionGenerator {
         }
 
         // Right
-        for (int x = newX + 1; x < state.BOARD_SIZE; x++) {
+        for (int x = newX + 1; x < State.BOARD_SIZE; x++) {
             if ((x == oldX && newY == oldY) || state.getPos(x, newY) == 0)
                 moves.add(new Action(oldX, oldY, newX, newY, x, newY));
             else
@@ -129,7 +135,7 @@ public class ActionGenerator {
         }
 
         // Up right
-        for (int offset = 1; offset <= Math.min(state.BOARD_SIZE - 1 - newX, state.BOARD_SIZE - 1 - newY); offset++) {
+        for (int offset = 1; offset <= Math.min(State.BOARD_SIZE - 1 - newX, State.BOARD_SIZE - 1 - newY); offset++) {
             if ((newX + offset == oldX && newY + offset == oldY) || state.getPos(newX + offset, newY + offset) == 0)
                 moves.add(new Action(oldX, oldY, newX, newY, newX + offset, newY + offset));
             else
@@ -137,7 +143,7 @@ public class ActionGenerator {
         }
 
         // Up Left
-        for (int offset = 1; offset <= Math.min(newX, state.BOARD_SIZE - 1 - newY); offset++) {
+        for (int offset = 1; offset <= Math.min(newX, State.BOARD_SIZE - 1 - newY); offset++) {
             if ((newX - offset == oldX && newY + offset == oldY) || state.getPos(newX - offset, newY + offset) == 0)
                 moves.add(new Action(oldX, oldY, newX, newY, newX - offset, newY + offset));
             else
@@ -153,7 +159,7 @@ public class ActionGenerator {
         }
 
         // Down right
-        for (int offset = 1; offset <= Math.min(state.BOARD_SIZE - 1 - newX, newY); offset++) {
+        for (int offset = 1; offset <= Math.min(State.BOARD_SIZE - 1 - newX, newY); offset++) {
             if ((newX + offset == oldX && newY - offset == oldY) || state.getPos(newX + offset, newY - offset) == 0)
                 moves.add(new Action(oldX, oldY, newX, newY, newX + offset, newY - offset));
             else
