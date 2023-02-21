@@ -17,8 +17,8 @@ public class ExpansionPolicy {
         Action randomAction = node.getPossibleActions()[randomInt];
         State state = new State(node.getState(), randomAction);
         int colour =  node.getColour() == State.BLACK_QUEEN ? State.WHITE_QUEEN: State.BLACK_QUEEN;
-        Action[] actions =  ActionGenerator.generateActions(state, colour).toArray(new Action[0]);
-        Node expansion = new Node(state, randomAction, node, colour, 0, 0, actions);
+        Action[] actions =  ActionGenerator.generateActions(state, colour, node.getDepth()).toArray(new Action[0]);
+        Node expansion = new Node(state, randomAction, node, colour, 0, 0, actions, node.getDepth() + 1);
         node.getChildren()[randomInt] = expansion;
         return expansion;
     }

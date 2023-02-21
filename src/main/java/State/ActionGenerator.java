@@ -3,13 +3,15 @@ package State;
 import java.util.ArrayList;
 
 public class ActionGenerator {
+    private static final int STARTING_MOVES_DEPTH = 10;
+
     /**
      * This method finds all positions that each queen could go to, then calls a subroutine to generate all the arrow moves from each of those queen moves.
      * @param state The state on which a move is to be made
      * @param color Which color is making a move. Use State.BLACK_QUEEN or State.WHITE_QUEEN
      * @return an ArrayList of legal actions
      */
-    public static ArrayList<Action> generateActions(State state, int color) {
+    public static ArrayList<Action> generateActions(State state, int color, int depth) {
         ArrayList<Action> moves = new ArrayList<>();
 
         int[][] queenPos = state.getQueens(color);
@@ -80,7 +82,15 @@ public class ActionGenerator {
             }
         }
 
-        return moves;
+        if (depth <= STARTING_MOVES_DEPTH) {
+            ArrayList<Action> out = new ArrayList<>();
+            for (Action action : moves) {
+//                if (action.getArrowPos().get(1) > )
+            }
+            return null;
+        } else {
+            return moves;
+        }
     }
 
     private static ArrayList<Action> getActionsFromNewQueenPos(int oldX, int oldY, int newX, int newY, State state) {

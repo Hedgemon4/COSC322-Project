@@ -26,6 +26,7 @@ public class Main extends GamePlayer {
 
     private MonteCarloTree monteCarloTree;
     private final double cValue = 2.0;
+    private int depth = 0;
 
 
     /**
@@ -86,7 +87,7 @@ public class Main extends GamePlayer {
                 // If we are black, we move first
                 boolean isBlack = msgDetails.get(AmazonsGameMessage.PLAYER_BLACK).equals(getGameClient().getUserName());
                 colour = isBlack ? State.BLACK_QUEEN : State.WHITE_QUEEN;
-                monteCarloTree = new MonteCarloTree(state, cValue, colour);
+                monteCarloTree = new MonteCarloTree(state, cValue, colour, depth);
                 if (isBlack)
                     makeMove();
                 break;
@@ -97,6 +98,7 @@ public class Main extends GamePlayer {
                 break;
             case GameMessage.GAME_ACTION_MOVE:
                 getGameGUI().updateGameState(msgDetails);
+                depth++;
                 Action a = new Action(msgDetails);
                 System.out.println("Opponent action: " + a);
                 if (!ActionChecker.validMove(state, a)) {
@@ -115,11 +117,12 @@ public class Main extends GamePlayer {
 
     private void makeMove() {
         makeMonteCarloMove();
+        depth++;
     }
 
     private void makeMonteCarloMove() {
         long start = System.currentTimeMillis();
-        monteCarloTree.setRoot(new Node(state, colour));
+        monteCarloTree.setRoot(new Node(state, colour, depth));
         Action definitelyTheBestAction = monteCarloTree.search();
 
         state = new State(state, definitelyTheBestAction);
@@ -135,7 +138,7 @@ public class Main extends GamePlayer {
 
     private void makeRandomMove() {
         long start = System.nanoTime();
-        ArrayList<Action> actions = ActionGenerator.generateActions(state, colour);
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, colour, depth);
         Action selectedAction = actions.get((int) (Math.random() * actions.size()));
         state = new State(state, selectedAction);
         getGameClient().sendMoveMessage(selectedAction.toServerResponse());

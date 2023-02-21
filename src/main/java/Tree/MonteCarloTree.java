@@ -6,9 +6,9 @@ public class MonteCarloTree {
     private final double cValue;
     private Node root;
 
-    public MonteCarloTree(State state, double cValue, int colour) {
+    public MonteCarloTree(State state, double cValue, int colour, int depth) {
         this.cValue = cValue;
-        root = new Node(state, colour);
+        root = new Node(state, colour, depth);
     }
 
     public Action search() {

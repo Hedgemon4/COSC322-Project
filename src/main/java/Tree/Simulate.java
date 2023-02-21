@@ -24,13 +24,14 @@ public class Simulate {
     private static int randomPlayout(Node node) {
         State state = new State(node.getState(), node.getAction());
         int color = node.getColour();
-        ArrayList<Action> actions = ActionGenerator.generateActions(state, color);
+        int depth = node.getDepth();
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, color, depth);
         Action selectedAction;
         while (actions.size() != 0) {
             selectedAction = actions.get((int) (Math.random() * actions.size()));
             state = new State(state, selectedAction);
             color = color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
-            actions = ActionGenerator.generateActions(state, color);
+            actions = ActionGenerator.generateActions(state, color, ++depth);
         }
         return color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
     }

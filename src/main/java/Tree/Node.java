@@ -14,17 +14,19 @@ public class Node {
     private Action action;
     private int colour;
 
-    public Node(State state, Action action, int colour) {
+    private int depth;
+
+    public Node(State state, Action action, int colour, int depth) {
         this.state = state;
         this.action = action;
         this.colour = colour;
-
-        possibleActions = ActionGenerator.generateActions(state, colour).toArray(new Action[0]);
+        this.depth = depth;
+        possibleActions = ActionGenerator.generateActions(state, colour, depth).toArray(new Action[0]);
         children = new Node[possibleActions.length];
     }
 
-    public Node(State state, int colour) {
-        this(state, null, colour);
+    public Node(State state, int colour, int depth) {
+        this(state, null, colour, depth);
     }
 
     public Node(State state, Action action, Node parent, int colour, int utilityValue, int totalPlayouts) {
@@ -36,7 +38,7 @@ public class Node {
         this.totalPlayouts = totalPlayouts;
     }
 
-    public Node(State state, Action action, Node parent, int colour, int utilityValue, int totalPlayouts, Action[] possibleActions) {
+    public Node(State state, Action action, Node parent, int colour, int utilityValue, int totalPlayouts, Action[] possibleActions, int depth) {
         this.state = state;
         this.action = action;
         this.parent = parent;
@@ -44,12 +46,21 @@ public class Node {
         this.totalWins = utilityValue;
         this.totalPlayouts = totalPlayouts;
         this.possibleActions = possibleActions;
+        this.depth = depth;
         children = new Node[possibleActions.length];
     }
 
     public Node(int utilityValue, int totalPlayouts) {
         this.totalWins = utilityValue;
         this.totalPlayouts = totalPlayouts;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
     }
 
     public Action[] getPossibleActions() {
