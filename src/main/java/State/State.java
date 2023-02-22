@@ -128,4 +128,8 @@ public class State implements Cloneable {
 
         return out.toString();
     }
+
+    public byte[][] getBoard() {
+        return board;
+    }
 }
