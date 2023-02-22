@@ -26,7 +26,7 @@ public class MonteCarloTree {
 
     private Node select(Node tree) {
         Node current = tree;
-
+        System.out.println(current.getState().boardToString());
         while (!current.isLeaf())
             current = UCBMove(current);
 
@@ -85,6 +85,8 @@ public class MonteCarloTree {
         for (Node child : n.getChildren()) {
             if (child == null)
                 continue;
+            if (bestChild == null)
+                bestChild = child;
             double val = UCBEquation(child);
             if (val > bestValue) {
                 bestValue = val;
