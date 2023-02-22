@@ -43,31 +43,33 @@ public class ExpansionPolicy {
             int queenX = action.getOldX();
             int queenY = action.getOldY();
             if (action.getNewX() == 0 || action.getNewX() == 9)
-                actionWeight[i] -= 5;
+                actionWeight[i] -= 50;
             if (action.getNewY() == 0 || action.getNewY() == 9)
-                actionWeight[i] -= 5;
+                actionWeight[i] -= 50;
             if (nodeLiberty[queenX][queenY] != 0) {
                 if (nodeLiberty[queenX][queenY] < 3)
                     actionWeight[i] += 20;
             }
             State result = new State(node.getState(), action);
             int[][] resultingLiberty = calculateLiberties(otherQueens, result.getBoard());
-            if (resultingLiberty[otherQueens[0][0]][otherQueens[0][1]] < otherLiberty[otherQueens[0][0]][otherQueens[0][1]]) {
+            if (resultingLiberty[otherQueens[0][0]][otherQueens[0][1]] < 3) {
                 actionWeight[i] += 10;
             }
-            if (resultingLiberty[otherQueens[1][0]][otherQueens[1][1]] < otherLiberty[otherQueens[1][0]][otherQueens[1][1]]) {
+            if (resultingLiberty[otherQueens[1][0]][otherQueens[1][1]] < 3) {
                 actionWeight[i] += 10;
             }
-            if (resultingLiberty[otherQueens[2][0]][otherQueens[2][1]] < otherLiberty[otherQueens[2][0]][otherQueens[2][1]]) {
+            if (resultingLiberty[otherQueens[2][0]][otherQueens[2][1]] < 3) {
                 actionWeight[i] += 10;
             }
-            if (resultingLiberty[otherQueens[3][0]][otherQueens[3][1]] < otherLiberty[otherQueens[3][0]][otherQueens[3][1]]) {
+            if (resultingLiberty[otherQueens[3][0]][otherQueens[3][1]] < 3) {
                 actionWeight[i] += 10;
             }
             if (actionWeight[i] > bestActionWeight) {
-                bestActionWeight = actionWeight[i];
-                pickedActionIndex = i;
-                state = result;
+                if(node.getChildren()[i] == null) {
+                    bestActionWeight = actionWeight[i];
+                    pickedActionIndex = i;
+                    state = result;
+                }
             }
             i++;
         }
@@ -76,6 +78,7 @@ public class ExpansionPolicy {
         Node expansion = new Node(state, node.getPossibleActions()[pickedActionIndex], node, colour, 0,
                 0, actions, node.getDepth() + 1);
         node.getChildren()[pickedActionIndex] = expansion;
+        System.out.println(expansion.getState().boardToString());
         return expansion;
     }
 
