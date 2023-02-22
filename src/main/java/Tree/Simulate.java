@@ -37,7 +37,7 @@ public class Simulate {
 
     private static int earlyTerminationPlayout(Node node) {
         int i = 0;
-        final int TERMINATION_DEPTH = 35;
+        final int TERMINATION_DEPTH = 30;
         State state = new State(node.getState(), node.getAction());
         int color = node.getColour();
         int depth = node.getDepth();
