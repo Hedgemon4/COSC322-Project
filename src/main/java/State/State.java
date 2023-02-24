@@ -69,6 +69,10 @@ public class State implements Cloneable {
         }
     }
 
+    public long zobristHash() {
+        return ZobristHash.hash(this);
+    }
+
     public int[][] getQueens(int color) {
         if (color == BLACK_QUEEN)
             return blackQueens;
