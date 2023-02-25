@@ -26,7 +26,6 @@ public class MonteCarloTree {
 
     private Node select(Node tree) {
         Node current = tree;
-
         while (!current.isLeaf())
             current = UCBMove(current);
 
@@ -44,7 +43,7 @@ public class MonteCarloTree {
      * @param child  The child node that was just simulated
      */
     public void backPropagate(int result, Node child) {
-        if (child.getColour() == result) {
+        if (child.getColour() != result) {
             child.setTotalPlayouts(child.getTotalPlayouts() + 1);
             child.setTotalWins(child.getTotalWins() + 1);
         } else {
@@ -53,7 +52,7 @@ public class MonteCarloTree {
 
         while (child.getParent() != null) {
             child = child.getParent();
-            if (child.getColour() == result) {
+            if (child.getColour() != result) {
                 child.setTotalPlayouts(child.getTotalPlayouts() + 1);
                 child.setTotalWins(child.getTotalWins() + 1);
             } else {
@@ -75,7 +74,6 @@ public class MonteCarloTree {
                 bestCount = child.getTotalPlayouts();
             }
         }
-
         return bestNode;
     }
 

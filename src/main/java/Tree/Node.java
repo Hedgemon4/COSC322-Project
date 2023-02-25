@@ -4,6 +4,8 @@ import State.Action;
 import State.ActionGenerator;
 import State.State;
 
+import java.util.Arrays;
+
 public class Node {
     private int totalWins;
     private int totalPlayouts;
@@ -126,5 +128,20 @@ public class Node {
 
     public void setColour(int colour) {
         this.colour = colour;
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "totalWins=" + totalWins +
+                ", totalPlayouts=" + totalPlayouts +
+                ", parent=" + parent +
+                ", children=" + Arrays.toString(children) +
+                ", possibleActions=" + Arrays.toString(possibleActions) +
+                ", state=" + state +
+                ", action=" + action +
+                ", colour=" + colour +
+                ", depth=" + depth +
+                '}';
     }
 }
