@@ -129,4 +129,19 @@ public class Node {
     public void setColour(int colour) {
         this.colour = colour;
     }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "totalWins=" + totalWins +
+                ", totalPlayouts=" + totalPlayouts +
+                ", parent=" + parent +
+                ", children=" + Arrays.toString(children) +
+                ", possibleActions=" + Arrays.toString(possibleActions) +
+                ", state=" + state +
+                ", action=" + action +
+                ", colour=" + colour +
+                ", depth=" + depth +
+                '}';
+    }
 }

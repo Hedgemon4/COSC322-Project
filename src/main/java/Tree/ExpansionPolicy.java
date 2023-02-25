@@ -78,7 +78,6 @@ public class ExpansionPolicy {
         Node expansion = new Node(state, node.getPossibleActions()[pickedActionIndex], node, colour, 0,
                 0, actions, node.getDepth() + 1);
         node.getChildren()[pickedActionIndex] = expansion;
-        System.out.println(expansion.getState().boardToString());
         return expansion;
     }
 
