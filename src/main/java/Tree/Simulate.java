@@ -50,7 +50,6 @@ public class Simulate {
             actions = ActionGenerator.generateActions(state, color, ++depth);
             i++;
         }
-        System.out.println(state.boardToString());
         if (i < TERMINATION_DEPTH)
             return color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
         else {

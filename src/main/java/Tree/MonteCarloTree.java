@@ -26,7 +26,6 @@ public class MonteCarloTree {
 
     private Node select(Node tree) {
         Node current = tree;
-        System.out.println(current.getState().boardToString());
         while (!current.isLeaf())
             current = UCBMove(current);
 

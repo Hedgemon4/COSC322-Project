@@ -10,7 +10,6 @@ public class ExpansionPolicy {
     }
 
     private static Node randomExpansion(Node node) {
-        System.out.println(node.getState().boardToString());
         int randomInt = (int) (Math.random() * node.getPossibleActions().length);
         while (node.getChildren()[randomInt] != null) {
             randomInt = (int) (Math.random() * node.getPossibleActions().length);
