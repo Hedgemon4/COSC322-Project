@@ -1,6 +1,7 @@
 ########################################################
 # Run via terminal with:
-# python "src/main/java/opening_moves/pattern finder.py"
+# python "src/main/java/opening_moves/top openers.py"
+# Might need to install matplotlib via "pip install matplotlib"
 ########################################################
 
 import csv
