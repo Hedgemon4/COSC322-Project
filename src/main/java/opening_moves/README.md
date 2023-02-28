@@ -1,0 +1,1 @@
+Games collected from the top 10 players on https://www.littlegolem.net/jsp/games/gamedetail.jsp?gtid=amzn
