@@ -1,0 +1,476 @@
+"C:\Program Files\Java\jdk-19\bin\java.exe" -Xmx8G "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2022.3.1\lib\idea_rt.jar=65085:C:\Program Files\JetBrains\IntelliJ IDEA 2022.3.1\bin" -agentpath:C:\Users\justi\AppData\Local\Temp\libasyncProfiler.dll=start,jfr,event=cpu,interval=10ms,jfrsync=profile,cstack=no,file=C:\Users\justi\Bot_2023_02_25_102214.jfr -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath "C:\Users\justi\OneDrive - UBC\Documents\School\COSC 322\Project\COSC322-Project\target\classes;C:\Users\justi\.m2\repository\ubc-yong-gao\ygraph-ai-smartfox-client\2.1\ygraph-ai-smartfox-client-2.1.jar;C:\Users\justi\.m2\repository\ubc-yong-gao\ygraph\1.0\ygraph-1.0.jar;C:\Users\justi\.m2\repository\smartfox\client-libs\SFS2X_API_Java\1.6\SFS2X_API_Java-1.6.jar;C:\Users\justi\.m2\repository\smartfox\client-libs\sfs2x-client-core\1.6\sfs2x-client-core-1.6.jar;C:\Users\justi\.m2\repository\smartfox\client-libs\netty\3.2.2\netty-3.2.2.jar;C:\Users\justi\.m2\repository\smartfox\client-libs\slf4j-api\1.6.1\slf4j-api-1.6.1.jar;C:\Users\justi\.m2\repository\smartfox\client-libs\slf4j-simple\1.6.1\slf4j-simple-1.6.1.jar;C:\Users\justi\.m2\repository\smartfox\client-libs\jdom\1.0\jdom-1.0.jar;C:\Users\justi\.m2\repository\smartfox\client-libs\commons-lang\2.4\commons-lang-2.4.jar" Main Bot tfef
+Kalamalka Lake(0,0)
+Kalamalka Lake
+(Room-join-response) RoomName:Kalamalka Lake; NumUser: 1; PlayerID: 1
+[sourceRoom, cmd, params]---[game-state, room.name]
+Extension Request from dispatch(): cosc322.game-state.board---Kalamalka Lake
+cmd:cosc322.game-state.board; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+10 - - - B - - B - - -
+ 9 - - - - - - - - - -
+ 8 - - - - - - - - - -
+ 7 B - - - - - - - - B
+ 6 - - - - - - - - - -
+ 5 - - - - - - - - - -
+ 4 W - - - - - - - - W
+ 3 - - - - - - - - - -
+ 2 - - - - - - - - - -
+ 1 - - - W - - W - - -
+   a b c d e f g h i j
+null
+[sourceRoom, cmd, params]---[room.name, player-white, player-black]
+Extension Request from dispatch(): cosc322.game-action.start---Kalamalka Lake
+cmd:cosc322.game-action.start; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Ran 14875 times
+10 - - - - - - B - - -
+ 9 - - - - - - - - - -
+ 8 - - - - - - - - - -
+ 7 B - - - - - - - - B
+ 6 - - - - - - - - - -
+ 5 - - - - - - - - - -
+ 4 W - - B - - - - - W
+ 3 - - X - - - - - - -
+ 2 - - - - - - - - - -
+ 1 - - - W - - W - - -
+   a b c d e f g h i j
+Bot action: d10-d4/c3
+Time taken: 29502ms
+null
+QCurr: [10, 4]
+QNew: [4, 4]
+Arrow: [3, 3]
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: d1-i6/i7
+QCurr: [1, 4]
+QNew: [6, 9]
+Arrow: [7, 9]
+Ran 19610 times
+QCurr: [10, 7]
+QNew: [2, 7]
+Arrow: [3, 7]
+10 - - - - - - - - - -
+ 9 - - - - - - - - - -
+ 8 - - - - - - - - - -
+ 7 B - - - - - - - X B
+ 6 - - - - - - - - W -
+ 5 - - - - - - - - - -
+ 4 W - - B - - - - - W
+ 3 - - X - - - X - - -
+ 2 - - - - - - B - - -
+ 1 - - - - - - W - - -
+   a b c d e f g h i j
+Bot action: g10-g2/g3
+Time taken: 29501ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: g1-e3/e4
+QCurr: [1, 7]
+QNew: [3, 5]
+Arrow: [4, 5]
+Ran 23676 times
+QCurr: [7, 10]
+QNew: [9, 10]
+Arrow: [5, 10]
+10 - - - - - - - - - -
+ 9 - - - - - - - - - B
+ 8 - - - - - - - - - -
+ 7 B - - - - - - - X -
+ 6 - - - - - - - - W -
+ 5 - - - - - - - - - X
+ 4 W - - B X - - - - W
+ 3 - - X - W - X - - -
+ 2 - - - - - - B - - -
+ 1 - - - - - - - - - -
+   a b c d e f g h i j
+Bot action: j7-j9/j5
+Time taken: 29500ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: a4-a6/b7
+QCurr: [4, 1]
+QNew: [6, 1]
+Arrow: [7, 2]
+Ran 16901 times
+QCurr: [9, 10]
+QNew: [9, 5]
+Arrow: [10, 6]
+10 - - - - - X - - - -
+ 9 - - - - B - - - - -
+ 8 - - - - - - - - - -
+ 7 B X - - - - - - X -
+ 6 W - - - - - - - W -
+ 5 - - - - - - - - - X
+ 4 - - - B X - - - - W
+ 3 - - X - W - X - - -
+ 2 - - - - - - B - - -
+ 1 - - - - - - - - - -
+   a b c d e f g h i j
+Bot action: j9-e9/f10
+Time taken: 29501ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: i6-e6/e8
+QCurr: [6, 9]
+QNew: [6, 5]
+Arrow: [8, 5]
+Ran 16310 times
+QCurr: [2, 7]
+QNew: [2, 4]
+Arrow: [3, 4]
+10 - - - - - X - - - -
+ 9 - - - - B - - - - -
+ 8 - - - - X - - - - -
+ 7 B X - - - - - - X -
+ 6 W - - - W - - - - -
+ 5 - - - - - - - - - X
+ 4 - - - B X - - - - W
+ 3 - - X X W - X - - -
+ 2 - - - B - - - - - -
+ 1 - - - - - - - - - -
+   a b c d e f g h i j
+Bot action: g2-d2/d3
+Time taken: 29501ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: e6-e5/d5
+QCurr: [6, 5]
+QNew: [5, 5]
+Arrow: [5, 4]
+Ran 21766 times
+QCurr: [2, 4]
+QNew: [2, 10]
+Arrow: [2, 7]
+10 - - - - - X - - - -
+ 9 - - - - B - - - - -
+ 8 - - - - X - - - - -
+ 7 B X - - - - - - X -
+ 6 W - - - - - - - - -
+ 5 - - - X W - - - - X
+ 4 - - - B X - - - - W
+ 3 - - X X W - X - - -
+ 2 - - - - - - X - - B
+ 1 - - - - - - - - - -
+   a b c d e f g h i j
+Bot action: d2-j2/g2
+Time taken: 29500ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: e3-g5/i3
+QCurr: [3, 5]
+QNew: [5, 7]
+Arrow: [3, 9]
+Ran 23853 times
+QCurr: [7, 1]
+QNew: [9, 3]
+Arrow: [5, 3]
+10 - - - - - X - - - -
+ 9 - - B - B - - - - -
+ 8 - - - - X - - - - -
+ 7 - X - - - - - - X -
+ 6 W - - - - - - - - -
+ 5 - - X X W - W - - X
+ 4 - - - B X - - - - W
+ 3 - - X X - - X - X -
+ 2 - - - - - - X - - B
+ 1 - - - - - - - - - -
+   a b c d e f g h i j
+Bot action: a7-c9/c5
+Time taken: 29501ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: g5-g9/f8
+QCurr: [5, 7]
+QNew: [9, 7]
+Arrow: [8, 6]
+Ran 27465 times
+QCurr: [2, 10]
+QNew: [1, 10]
+Arrow: [7, 4]
+10 - - - - - X - - - -
+ 9 - - B - B - W - - -
+ 8 - - - - X X - - - -
+ 7 - X - X - - - - X -
+ 6 W - - - - - - - - -
+ 5 - - X X W - - - - X
+ 4 - - - B X - - - - W
+ 3 - - X X - - X - X -
+ 2 - - - - - - X - - -
+ 1 - - - - - - - - - B
+   a b c d e f g h i j
+Bot action: j2-j1/d7
+Time taken: 29500ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: a6-a2/c4
+QCurr: [6, 1]
+QNew: [2, 1]
+Arrow: [4, 3]
+Ran 30590 times
+QCurr: [9, 3]
+QNew: [5, 7]
+Arrow: [9, 3]
+10 - - - - - X - - - -
+ 9 - - X - B - W - - -
+ 8 - - - - X X - - - -
+ 7 - X - X - - - - X -
+ 6 - - - - - - - - - -
+ 5 - - X X W - B - - X
+ 4 - - X B X - - - - W
+ 3 - - X X - - X - X -
+ 2 W - - - - - X - - -
+ 1 - - - - - - - - - B
+   a b c d e f g h i j
+Bot action: c9-g5/c9
+Time taken: 29501ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: a2-f2/e3
+QCurr: [2, 1]
+QNew: [2, 6]
+Arrow: [3, 5]
+Ran 37809 times
+QCurr: [5, 7]
+QNew: [5, 8]
+Arrow: [4, 9]
+10 - - - - - X - - - -
+ 9 - - X - B - W - - -
+ 8 - - - - X X - - - -
+ 7 - X - X - - - - X -
+ 6 - - - - - - - - - -
+ 5 - - X X W - - B - X
+ 4 - - X B X - - - X W
+ 3 - - X X X - X - X -
+ 2 - - - - - W X - - -
+ 1 - - - - - - - - - B
+   a b c d e f g h i j
+Bot action: g5-h5/i4
+Time taken: 29500ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: j4-h6/g6
+QCurr: [4, 10]
+QNew: [6, 8]
+Arrow: [6, 7]
+Ran 41460 times
+QCurr: [1, 10]
+QNew: [1, 4]
+Arrow: [1, 10]
+10 - - - - - X - - - -
+ 9 - - X - B - W - - -
+ 8 - - - - X X - - - -
+ 7 - X - X - - - - X -
+ 6 - - - - - - X W - -
+ 5 - - X X W - - B - X
+ 4 - - X B X - - - X -
+ 3 - - X X X - X - X -
+ 2 - - - - - W X - - -
+ 1 - - - B - - - - - X
+   a b c d e f g h i j
+Bot action: j1-d1/j1
+Time taken: 29501ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: f2-c2/c1
+QCurr: [2, 6]
+QNew: [2, 3]
+Arrow: [1, 3]
+Ran 45829 times
+QCurr: [5, 8]
+QNew: [3, 8]
+Arrow: [5, 6]
+10 - - - - - X - - - -
+ 9 - - X - B - W - - -
+ 8 - - - - X X - - - -
+ 7 - X - X - - - - X -
+ 6 - - - - - - X W - -
+ 5 - - X X W X - - - X
+ 4 - - X B X - - - X -
+ 3 - - X X X - X B X -
+ 2 - - W - - - X - - -
+ 1 - - X B - - - - - X
+   a b c d e f g h i j
+Bot action: h5-h3/f5
+Time taken: 29500ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: h6-h4/g4
+QCurr: [6, 8]
+QNew: [4, 8]
+Arrow: [4, 7]
+Ran 49205 times
+QCurr: [9, 5]
+QNew: [10, 5]
+Arrow: [9, 6]
+10 - - - - B X - - - -
+ 9 - - X - - X W - - -
+ 8 - - - - X X - - - -
+ 7 - X - X - - - - X -
+ 6 - - - - - - X - - -
+ 5 - - X X W X - - - X
+ 4 - - X B X - X W X -
+ 3 - - X X X - X B X -
+ 2 - - W - - - X - - -
+ 1 - - X B - - - - - X
+   a b c d e f g h i j
+Bot action: e9-e10/f9
+Time taken: 29500ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: e5-c7/e5
+QCurr: [5, 5]
+QNew: [7, 3]
+Arrow: [5, 5]
+Ran 58181 times
+QCurr: [10, 5]
+QNew: [10, 1]
+10 B - - - - X - - - -
+ 9 - - X - - X W - - -
+ 8 - - - - X X - - - -
+ 7 - X W X - - - - X -
+ 6 - - - - - - X - - -
+ 5 - - X X X X - - - X
+ 4 - - X B X - X W X -
+ 3 X - X X X - X B X -
+ 2 - - W - - - X - - -
+ 1 - - X B - - - - - X
+   a b c d e f g h i j
+Bot action: e10-a10/a3
+Time taken: 29500ms
+Arrow: [3, 1]
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: c7-a9/b9
+QCurr: [7, 3]
+QNew: [9, 1]
+Arrow: [9, 2]
+Ran 77028 times
+QCurr: [10, 1]
+QNew: [10, 4]
+Arrow: [10, 2]
+10 - X - B - X - - - -
+ 9 W X X - - X W - - -
+ 8 - - - - X X - - - -
+ 7 - X - X - - - - X -
+ 6 - - - - - - X - - -
+ 5 - - X X X X - - - X
+ 4 - - X B X - X W X -
+ 3 X - X X X - X B X -
+ 2 - - W - - - X - - -
+ 1 - - X B - - - - - X
+   a b c d e f g h i j
+Bot action: a10-d10/b10
+Time taken: 29500ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: h4-d8/h4
+QCurr: [4, 8]
+QNew: [8, 4]
+Arrow: [4, 8]
+Ran 95319 times
+QCurr: [3, 8]
+QNew: [1, 8]
+Arrow: [2, 8]
+10 - X - B - X - - - -
+ 9 W X X - - X W - - -
+ 8 - - - W X X - - - -
+ 7 - X - X - - - - X -
+ 6 - - - - - - X - - -
+ 5 - - X X X X - - - X
+ 4 - - X B X - X X X -
+ 3 X - X X X - X - X -
+ 2 - - W - - - X X - -
+ 1 - - X B - - - B - X
+   a b c d e f g h i j
+Bot action: h3-h1/h2
+Time taken: 29500ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: d8-d9/e9
+QCurr: [8, 4]
+QNew: [9, 4]
+Arrow: [9, 5]
+Ran 144839 times
+QCurr: [1, 8]
+QNew: [3, 10]
+Arrow: [2, 9]
+10 - X - B - X - - - -
+ 9 W X X W X X W - - -
+ 8 - - - - X X - - - -
+ 7 - X - X - - - - X -
+ 6 - - - - - - X - - -
+ 5 - - X X X X - - - X
+ 4 - - X B X - X X X -
+ 3 X - X X X - X - X B
+ 2 - - W - - - X X X -
+ 1 - - X B - - - - - X
+   a b c d e f g h i j
+Bot action: h1-j3/i2
+Time taken: 29500ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: g9-g7/j4
+QCurr: [9, 7]
+QNew: [7, 7]
+Arrow: [4, 10]
+Ran 165719 times
+QCurr: [1, 4]
+QNew: [1, 5]
+Arrow: [1, 8]
+10 - X - B - X - - - -
+ 9 W X X W X X - - - -
+ 8 - - - - X X - - - -
+ 7 - X - X - - W - X -
+ 6 - - - - - - X - - -
+ 5 - - X X X X - - - X
+ 4 - - X B X - X X X X
+ 3 X - X X X - X - X B
+ 2 - - W - - - X X X -
+ 1 - - X - B - - X - X
+   a b c d e f g h i j
+Bot action: d1-e1/h1
+Time taken: 29500ms
+[sourceRoom, cmd, params]---[queen-position-current, queen-position-next, __[[REQUEST_ID]]__, room.name, arrow-position]
+Extension Request from dispatch(): cosc322.game-action.move---Kalamalka Lake
+cmd:cosc322.game-action.move; From:Kalamalka Lake; CurrRoom: Kalamalka Lake
+Opponent action: g7-h6/f4
+QCurr: [7, 7]
+QNew: [6, 8]
+Arrow: [4, 6]
+Ran 189369 times
+QCurr: [1, 5]
+QNew: [1, 4]
+10 - X - B - X - - - -
+ 9 W X X W X X - - - -
+ 8 - - - - X X - - - -
+ 7 - X - X - - - - X -
+ 6 - - - - - - X W - -
+ 5 - - X X X X - - - X
+ 4 - - X B X X X X X X
+ 3 X - X X X - X - X B
+ 2 - - W - - - X X X -
+ 1 - - X B - - X X - X
+   a b c d e f g h i j
+Bot action: e1-d1/g1
+Time taken: 29500ms
+Arrow: [1, 7]
+[sourceRoom, cmd, params]---[player-lost]
+Extension Request from dispatch(): cosc322.game-state.userlost---null
+cmd:cosc322.game-state.userlost; From:null; CurrRoom: Kalamalka Lake
+null

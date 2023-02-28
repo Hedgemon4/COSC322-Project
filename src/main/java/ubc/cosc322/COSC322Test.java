@@ -117,7 +117,7 @@ public class COSC322Test extends GamePlayer {
 
 	private void makeRandomMove() {
 		long start = System.nanoTime();
-		ArrayList<Action> actions = ActionGenerator.generateActions(state, isBlack ? State.BLACK_QUEEN : State.WHITE_QUEEN);
+		ArrayList<Action> actions = ActionGenerator.generateActions(state, isBlack ? State.BLACK_QUEEN : State.WHITE_QUEEN, 100);
 		Action selectedAction = actions.get((int) (Math.random() * actions.size()));
 		state = new State(state, selectedAction);
 		getGameClient().sendMoveMessage(selectedAction.toServerResponse());

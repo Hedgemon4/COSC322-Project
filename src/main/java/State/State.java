@@ -5,10 +5,10 @@ import java.util.ArrayList;
 public class State implements Cloneable {
     // 0 = empty, 1 = black queen, 2 = white queen, 3 = arrow
     private byte[][] board;
-    private final int[][] blackQueens;
-    private final int[][] whiteQueens;
+    private int[][] blackQueens;
+    private int[][] whiteQueens;
 
-    public final int BOARD_SIZE = 10;
+    public static final int BOARD_SIZE = 10;
     public static final int WHITE_QUEEN = 2;
     public static final int BLACK_QUEEN = 1;
     public static final int ARROW = 3;
@@ -42,23 +42,23 @@ public class State implements Cloneable {
             blackQueens = cloned.blackQueens;
             whiteQueens = cloned.whiteQueens;
 
-            byte movingQueen = board[action.getOldPos().get(0)][action.getOldPos().get(1)];
-            board[action.getNewPos().get(0)][action.getNewPos().get(1)] = movingQueen;
-            board[action.getOldPos().get(0)][action.getOldPos().get(1)] = 0;
-            board[action.getArrowPos().get(0)][action.getArrowPos().get(1)] = 3;
+            byte movingQueen = board[action.getOldX()][action.getOldY()];
+            board[action.getNewX()][action.getNewY()] = movingQueen;
+            board[action.getOldX()][action.getOldY()] = 0;
+            board[action.getArrowX()][action.getArrowY()] = 3;
 
             // Update the queen that moved
             if (movingQueen == BLACK_QUEEN) {
                 for (int i = 0; i < blackQueens.length; i++) {
-                    if (blackQueens[i][0] == action.getOldPos().get(0) && blackQueens[i][1] == action.getOldPos().get(1)) {
-                        blackQueens[i] = new int[]{action.getNewPos().get(0), action.getNewPos().get(1)};
+                    if (blackQueens[i][0] == action.getOldX() && blackQueens[i][1] == action.getOldY()) {
+                        blackQueens[i] = new int[]{action.getNewX(), action.getNewY()};
                         break;
                     }
                 }
             } else {
                 for (int i = 0; i < whiteQueens.length; i++) {
-                    if (whiteQueens[i][0] == action.getOldPos().get(0) && whiteQueens[i][1] == action.getOldPos().get(1)) {
-                        whiteQueens[i] = new int[]{action.getNewPos().get(0), action.getNewPos().get(1)};
+                    if (whiteQueens[i][0] == action.getOldX() && whiteQueens[i][1] == action.getOldY()) {
+                        whiteQueens[i] = new int[]{action.getNewX(), action.getNewY()};
                         break;
                     }
                 }
@@ -69,7 +69,11 @@ public class State implements Cloneable {
         }
     }
 
-    int[][] getQueens(int color) {
+    public long zobristHash() {
+        return ZobristHash.hash(this);
+    }
+
+    public int[][] getQueens(int color) {
         if (color == BLACK_QUEEN)
             return blackQueens;
         else if (color == WHITE_QUEEN)
@@ -84,7 +88,22 @@ public class State implements Cloneable {
 
     public Object clone() throws CloneNotSupportedException {
         State clone = (State) super.clone();
-        clone.board = this.board.clone();
+
+        clone.board = new byte[this.board.length][];
+        for (int i = 0; i < this.board.length; i++) {
+            clone.board[i] = this.board[i].clone();
+        }
+
+        clone.blackQueens = new int[this.blackQueens.length][];
+        for (int i = 0; i < clone.blackQueens.length; i++) {
+            clone.blackQueens[i] = this.blackQueens[i].clone();
+        }
+
+        clone.whiteQueens = new int[this.whiteQueens.length][];
+        for (int i = 0; i < clone.whiteQueens.length; i++) {
+            clone.whiteQueens[i] = this.whiteQueens[i].clone();
+        }
+
         return clone;
     }
 
@@ -112,5 +131,9 @@ public class State implements Cloneable {
         out.append("   a b c d e f g h i j");
 
         return out.toString();
+    }
+
+    public byte[][] getBoard() {
+        return board;
     }
 }

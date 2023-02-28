@@ -8,9 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Action {
-    private final ArrayList<Integer> oldPos;
-    private final ArrayList<Integer> newPos;
-    private final ArrayList<Integer> arrowPos;
+    private int oldX;
+    private int oldY;
+    private int newX;
+    private int newY;
+    private int arrowX;
+    private int arrowY;
 
     /**
      * Converts a map to an action. Each action in the input is 1 indexed and is converted to a 0 indexed action internally
@@ -18,24 +21,17 @@ public class Action {
      */
     @SuppressWarnings("unchecked")
     public Action(Map<String, Object> actionMap) {
-        oldPos = (ArrayList<Integer>) ((ArrayList<Integer>) actionMap.get(AmazonsGameMessage.QUEEN_POS_CURR)).clone();
-        newPos = (ArrayList<Integer>) ((ArrayList<Integer>) actionMap.get(AmazonsGameMessage.QUEEN_POS_NEXT)).clone();
-        arrowPos = (ArrayList<Integer>) ((ArrayList<Integer>) actionMap.get(AmazonsGameMessage.ARROW_POS)).clone();
+        ArrayList<Integer> oldPos = (ArrayList<Integer>) ((ArrayList<Integer>) actionMap.get(AmazonsGameMessage.QUEEN_POS_CURR)).clone();
+        ArrayList<Integer> newPos = (ArrayList<Integer>) ((ArrayList<Integer>) actionMap.get(AmazonsGameMessage.QUEEN_POS_NEXT)).clone();
+        ArrayList<Integer> arrowPos = (ArrayList<Integer>) ((ArrayList<Integer>) actionMap.get(AmazonsGameMessage.ARROW_POS)).clone();
 
         // idk why, but the server sends 1 indexed (y, x) coordinates. kinda whack
-        int oldX = oldPos.get(1);
-        int oldY = oldPos.get(0);
-        int newX = newPos.get(1);
-        int newY = newPos.get(0);
-        int arrowX = arrowPos.get(1);
-        int arrowY = arrowPos.get(0);
-
-        oldPos.set(0, oldX - 1);
-        oldPos.set(1, oldY - 1);
-        newPos.set(0, newX - 1);
-        newPos.set(1, newY - 1);
-        arrowPos.set(0, arrowX - 1);
-        arrowPos.set(1, arrowY - 1);
+        oldX = oldPos.get(1) - 1;
+        oldY = oldPos.get(0) - 1;
+        newX = newPos.get(1) - 1;
+        newY = newPos.get(0) - 1;
+        arrowX = arrowPos.get(1) - 1;
+        arrowY = arrowPos.get(0) - 1;
     }
 
     /**
@@ -48,21 +44,60 @@ public class Action {
      * @param arrowY The y position of the arrow
      */
     Action(int oldX, int oldY, int newX, int newY, int arrowX, int arrowY) {
-        oldPos = new ArrayList<>(Arrays.asList(oldX, oldY));
-        newPos = new ArrayList<>(Arrays.asList(newX, newY));
-        arrowPos = new ArrayList<>(Arrays.asList(arrowX, arrowY));
+        this.oldX = oldX;
+        this.oldY = oldY;
+        this.newX = newX;
+        this.newY = newY;
+        this.arrowX = arrowX;
+        this.arrowY = arrowY;
     }
 
-    public ArrayList<Integer> getOldPos() {
-        return oldPos;
+    public int getOldX() {
+        return oldX;
     }
 
-    public ArrayList<Integer> getNewPos() {
-        return newPos;
+    public void setOldX(int oldX) {
+        this.oldX = oldX;
     }
 
-    public ArrayList<Integer> getArrowPos() {
-        return arrowPos;
+    public int getOldY() {
+        return oldY;
+    }
+
+    public void setOldY(int oldY) {
+        this.oldY = oldY;
+    }
+
+    public int getNewX() {
+        return newX;
+    }
+
+    public void setNewX(int newX) {
+        this.newX = newX;
+    }
+
+    public int getNewY() {
+        return newY;
+    }
+
+    public void setNewY(int newY) {
+        this.newY = newY;
+    }
+
+    public int getArrowX() {
+        return arrowX;
+    }
+
+    public void setArrowX(int arrowX) {
+        this.arrowX = arrowX;
+    }
+
+    public int getArrowY() {
+        return arrowY;
+    }
+
+    public void setArrowY(int arrowY) {
+        this.arrowY = arrowY;
     }
 
     /**
@@ -72,7 +107,7 @@ public class Action {
     @Override
     public String toString() {
         String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
-        return letters[oldPos.get(0)] + (oldPos.get(1) + 1) + "-" + letters[newPos.get(0)] + (newPos.get(1) + 1) + "/" + letters[arrowPos.get(0)] + (arrowPos.get(1) + 1);
+        return letters[oldX] + (oldY + 1) + "-" + letters[newX] + (newY + 1) + "/" + letters[arrowX] + (arrowY + 1);
     }
 
     /**
@@ -81,9 +116,9 @@ public class Action {
      */
     public Map<String, Object> toServerResponse() {
         Map<String, Object> map = new HashMap<>();
-        map.put(AmazonsGameMessage.QUEEN_POS_CURR, new ArrayList<>(Arrays.asList(oldPos.get(1) + 1, oldPos.get(0) + 1)));
-        map.put(AmazonsGameMessage.QUEEN_POS_NEXT, new ArrayList<>(Arrays.asList(newPos.get(1) + 1, newPos.get(0) + 1)));
-        map.put(AmazonsGameMessage.ARROW_POS, new ArrayList<>(Arrays.asList(arrowPos.get(1) + 1, arrowPos.get(0) + 1)));
+        map.put(AmazonsGameMessage.QUEEN_POS_CURR, new ArrayList<>(Arrays.asList(oldY + 1, oldX + 1)));
+        map.put(AmazonsGameMessage.QUEEN_POS_NEXT, new ArrayList<>(Arrays.asList(newY + 1, newX + 1)));
+        map.put(AmazonsGameMessage.ARROW_POS, new ArrayList<>(Arrays.asList(arrowY + 1, arrowX + 1)));
         return map;
     }
 }
