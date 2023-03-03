@@ -42,9 +42,20 @@ public class Simulate {
         int color = node.getColour();
         int depth = node.getDepth();
         ArrayList<Action> actions = ActionGenerator.generateActions(state, color, depth);
-        Action selectedAction;
         while (actions.size() != 0 && i < TERMINATION_DEPTH) {
-            selectedAction = actions.get((int) (Math.random() * actions.size()));
+            int k = 0;
+            int maxActions = 0;
+            int maxIndex = 0;
+            for (Action action : actions) {
+                state = new State(state, action);
+                color = (color == State.BLACK_QUEEN) ? State.WHITE_QUEEN : State.BLACK_QUEEN;
+                int numActions = ActionGenerator.generateNumberOfActions(state, color, ++depth);
+                if (maxActions < numActions) {
+                    maxIndex = k;
+                }
+                k++;
+            }
+            Action selectedAction = actions.get(maxIndex);
             state = new State(state, selectedAction);
             color = (color == State.BLACK_QUEEN) ? State.WHITE_QUEEN : State.BLACK_QUEEN;
             actions = ActionGenerator.generateActions(state, color, ++depth);
@@ -63,6 +74,7 @@ public class Simulate {
                 return State.WHITE_QUEEN;
         }
     }
+
 
     private static int boardControlHeuristic(State state, int colour) {
         int[][] queens = state.getQueens(colour);
