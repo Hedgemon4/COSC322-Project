@@ -7,6 +7,7 @@ public class State implements Cloneable {
     private byte[][] board;
     private int[][] blackQueens;
     private int[][] whiteQueens;
+    private BitBoard bitBoard;
 
     public static final int BOARD_SIZE = 10;
     public static final int WHITE_QUEEN = 2;
@@ -14,10 +15,10 @@ public class State implements Cloneable {
     public static final int ARROW = 3;
 
     public State(ArrayList<Integer> gameState) {
+        bitBoard = new BitBoard();
         board = new byte[BOARD_SIZE][BOARD_SIZE];
         blackQueens = new int[4][2];
         whiteQueens = new int[4][2];
-
         int blackQueensFound = 0;
         int whiteQueensFound = 0;
         for (int x = 0; x < BOARD_SIZE; x++) {
@@ -33,6 +34,11 @@ public class State implements Cloneable {
                 }
             }
         }
+        System.out.println("Checking boards");
+        System.out.println(boardToString());
+        System.out.println("New");
+        bitBoard.boardToBitMap(board);
+        System.out.println(bitBoard.boardToString());
     }
 
     public State(State state, Action action) {
