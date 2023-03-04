@@ -13,15 +13,26 @@ public class MonteCarloTree {
 
     public Action search() {
         Node tree = root;
-        Timer time = new Timer(29.5);
-        while (time.timeLeft()) {
-            Node leaf = select(tree);
-            Node child = expand(leaf);
-            int result = Simulate.simulate(child);
-            backPropagate(result, child);
+        Timer time = new Timer(2);
+        try {
+            while (time.timeLeft()) {
+                Node leaf = select(tree);
+                Node child = expand(leaf);
+                int result = Simulate.simulate(child);
+                backPropagate(result, child);
+            }
+            System.out.println("Ran " + getRoot().getTotalPlayouts() + " times");
+
         }
-        System.out.println("Ran " + getRoot().getTotalPlayouts() + " times");
-        return mostVisitedNode().getAction();
+        catch(Exception NullPointerException){
+
+        }
+        if(mostVisitedNode()==null){
+            return null;
+        }
+        else {
+            return mostVisitedNode().getAction();
+        }
     }
 
     private Node select(Node tree) {
