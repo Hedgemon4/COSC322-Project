@@ -21,9 +21,15 @@ public class BitBoard {
         int index = row * 10 + col;
         long mask = 1L << index;
         switch (pieceType) {
-            case BLACK_QUEEN -> blackQueens |= mask;
-            case WHITE_QUEEN -> whiteQueens |= mask;
-            case ARROW -> arrow |= mask;
+            case BLACK_QUEEN:
+                blackQueens |= mask;
+                break;
+            case WHITE_QUEEN:
+                whiteQueens |= mask;
+                break;
+            case ARROW:
+                arrow |= mask;
+                break;
         }
     }
 
@@ -31,21 +37,31 @@ public class BitBoard {
         int index = row * 10 + col;
         long mask = ~(1L << index);
         switch (pieceType) {
-            case BLACK_QUEEN -> blackQueens &= mask;
-            case WHITE_QUEEN -> whiteQueens &= mask;
-            case ARROW -> arrow &= mask;
+            case BLACK_QUEEN:
+                blackQueens &= mask;
+                break;
+            case WHITE_QUEEN:
+                whiteQueens &= mask;
+                break;
+            case ARROW:
+                arrow &= mask;
+                break;
         }
     }
 
     public boolean isPiece(int row, int col, int pieceType) {
         int index = row * 10 + col;
         long mask = 1L << index;
-        return switch (pieceType) {
-            case BLACK_QUEEN -> (blackQueens & mask) != 0L;
-            case WHITE_QUEEN -> (whiteQueens & mask) != 0L;
-            case ARROW -> (arrow & mask) != 0L;
-            default -> false;
-        };
+        switch (pieceType) {
+            case BLACK_QUEEN:
+                return (blackQueens & mask) != 0L;
+            case WHITE_QUEEN:
+                return (whiteQueens & mask) != 0L;
+            case ARROW:
+                return (arrow & mask) != 0L;
+            default:
+                return false;
+        }
     }
 
     public int getPiece(int row, int col) {
@@ -81,10 +97,17 @@ public class BitBoard {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 int pieceType = getPiece(i, j);
                 switch (pieceType) {
-                    case BLACK_QUEEN -> sb.append("B");
-                    case WHITE_QUEEN -> sb.append("W");
-                    case ARROW -> sb.append("X");
-                    case default -> sb.append("-");
+                    case BLACK_QUEEN:
+                        sb.append("B");
+                        break;
+                    case WHITE_QUEEN:
+                        sb.append("W");
+                        break;
+                    case ARROW:
+                        sb.append("X");
+                        break;
+                    default:
+                        sb.append("-");
                 }
                 sb.append(" ");
             }
@@ -102,10 +125,18 @@ public class BitBoard {
                     sb.append(String.format("%2d ", y + 1));
                 int pieceType = getPiece(x, y);
                 switch (pieceType) {
-                    case BLACK_QUEEN -> sb.append("B ");
-                    case WHITE_QUEEN -> sb.append("W ");
-                    case ARROW -> sb.append("X ");
-                    case 0 -> sb.append("- ");
+                    case BLACK_QUEEN:
+                        sb.append("B ");
+                        break;
+                    case WHITE_QUEEN:
+                        sb.append("W ");
+                        break;
+                    case ARROW:
+                        sb.append("X ");
+                        break;
+                    case 0:
+                        sb.append("- ");
+                        break;
                 }
             }
             sb.append("\n");
