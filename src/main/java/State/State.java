@@ -16,6 +16,12 @@ public class State implements Cloneable {
 
     public State(ArrayList<Integer> gameState) {
         bitBoard = new BitBoard();
+        for (int i = 0; i < BOARD_SIZE; i ++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                int pieceNumber = gameState.get((j+1)*11 + i+1);
+                bitBoard.setPiece(i, j, gameState.get((j+1)*11 + i+1));
+            }
+        }
         board = new byte[BOARD_SIZE][BOARD_SIZE];
         blackQueens = new int[4][2];
         whiteQueens = new int[4][2];
@@ -37,8 +43,12 @@ public class State implements Cloneable {
         System.out.println("Checking boards");
         System.out.println(boardToString());
         System.out.println("New");
-        bitBoard.boardToBitMap(board);
         System.out.println(bitBoard.boardToString());
+        System.out.println("White Queens: ");
+        System.out.println(Long.toBinaryString(bitBoard.whiteQueensTop) + Long.toBinaryString(bitBoard.whiteQueensBottom));
+        System.out.println("Black Queens");
+        System.out.println(Long.toBinaryString(bitBoard.blackQueensTop) + Long.toBinaryString(bitBoard.blackQueensBottom));
+        System.out.println("Next thing");
     }
 
     public State(State state, Action action) {
