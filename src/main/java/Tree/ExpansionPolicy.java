@@ -3,6 +3,7 @@ package Tree;
 import State.Action;
 import State.ActionGenerator;
 import State.State;
+import State.BitBoard;
 
 public class ExpansionPolicy {
     public static Node expansionNode(Node node) {
@@ -23,15 +24,18 @@ public class ExpansionPolicy {
         return expansion;
     }
 
+    private static Node libertyExpansionBitmap(Node node) {
+
+    }
+
     private static Node libertyExpansionPolicy(Node node) {
         // Want to prioritize moving queens which might get trapped
         int[][] nodeQueens = node.getState().getQueens(node.getColour());
-        byte[][] board = node.getState().getBoard();
-        int[][] nodeLiberty = calculateLiberties(nodeQueens, board);
+        int nodeLiberty = calculateLiberties(nodeQueens, node.getState().getBitBoard());
         // Prioritize trapping enemy queens
         int otherColour = node.getColour() == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
         int[][] otherQueens = node.getState().getQueens(otherColour);
-        int[][] otherLiberty = calculateLiberties(otherQueens, board);
+        int otherColourLiberty = calculateLiberties(otherQueens, node.getState().getBitBoard());
         // Don't make moves if trapped
         int[] actionWeight = new int[node.getPossibleActions().length];
         int i = 0;
@@ -39,32 +43,20 @@ public class ExpansionPolicy {
         int bestActionWeight = -999999;
         State state = node.getState();
         for (Action action : node.getPossibleActions()) {
-            int queenX = action.getOldX();
-            int queenY = action.getOldY();
             if (action.getNewX() == 0 || action.getNewX() == 9)
                 actionWeight[i] -= 50;
             if (action.getNewY() == 0 || action.getNewY() == 9)
                 actionWeight[i] -= 50;
-            if (nodeLiberty[queenX][queenY] != 0) {
-                if (nodeLiberty[queenX][queenY] < 3)
-                    actionWeight[i] += 20;
-            }
             State result = new State(node.getState(), action);
-            int[][] resultingLiberty = calculateLiberties(otherQueens, result.getBoard());
-            if (resultingLiberty[otherQueens[0][0]][otherQueens[0][1]] < 3) {
-                actionWeight[i] += 10;
-            }
-            if (resultingLiberty[otherQueens[1][0]][otherQueens[1][1]] < 3) {
-                actionWeight[i] += 10;
-            }
-            if (resultingLiberty[otherQueens[2][0]][otherQueens[2][1]] < 3) {
-                actionWeight[i] += 10;
-            }
-            if (resultingLiberty[otherQueens[3][0]][otherQueens[3][1]] < 3) {
+            int resultingLibertyCurrentQueens = calculateLiberties(nodeQueens, result.getBitBoard());
+                if (resultingLibertyCurrentQueens > nodeLiberty)
+                    actionWeight[i] += 20;
+            int resultingLibertyEnemyQueens = calculateLiberties(otherQueens, result.getBitBoard());
+            if (resultingLibertyEnemyQueens < otherColourLiberty) {
                 actionWeight[i] += 10;
             }
             if (actionWeight[i] > bestActionWeight) {
-                if(node.getChildren()[i] == null) {
+                if (node.getChildren()[i] == null) {
                     bestActionWeight = actionWeight[i];
                     pickedActionIndex = i;
                     state = result;
@@ -78,6 +70,31 @@ public class ExpansionPolicy {
                 0, actions, node.getDepth() + 1);
         node.getChildren()[pickedActionIndex] = expansion;
         return expansion;
+    }
+
+    private static int calculateLiberties(int[][] queens, BitBoard bitBoard) {
+        int liberty = 0;
+        for (int[] queen : queens) {
+            int x = queen[0];
+            int y = queen[1];
+            if (x + 1 < 10)
+                liberty += bitBoard.getPiece(x + 1, y) == 0 ? 1 : 0;
+            if (x - 1 > -1)
+                liberty += bitBoard.getPiece(x - 1, y) == 0 ? 1 : 0;
+            if (y + 1 < 10)
+                liberty += bitBoard.getPiece(x, y + 1) == 0 ? 1 : 0;
+            if (y - 1 > -1)
+                liberty += bitBoard.getPiece(x, y - 1) == 0 ? 1 : 0;
+            if (x + 1 < 10 && y + 1 < 10)
+                liberty += bitBoard.getPiece(x + 1, y + 1) == 0 ? 1 : 0;
+            if (x + 1 < 10 && y - 1 > -1)
+                liberty += bitBoard.getPiece(x + 1, y - 1) == 0 ? 1 : 0;
+            if (x - 1 > -1 && y + 1 < 10)
+                liberty += bitBoard.getPiece(x - 1, y + 1) == 0 ? 1 : 0;
+            if (x - 1 > -1 && y - 1 > -1)
+                liberty += bitBoard.getPiece(x - 1, y - 1) == 0 ? 1 : 0;
+        }
+        return liberty;
     }
 
     private static int[][] calculateLiberties(int[][] queens, byte[][] board) {

@@ -15,19 +15,20 @@ public class ZobristHash {
      * @return The hash of the state
      */
     public static long hash(State s) {
-        if (!initialized)
-            init();
-
-        byte[][] board = s.getBoard();
-
-        long hash = 0;
-
-        // XOR all the zobrist values for each piece on the board
-        for (int x = 0; x < board.length; x++)
-            for (int y = 0; y < board[x].length; y++)
-                hash ^= zobristTable[x + y*State.BOARD_SIZE + board[x][y]*100];
-
-        return hash;
+//        if (!initialized)
+//            init();
+//
+//        byte[][] board = s.getBoard();
+//
+//        long hash = 0;
+//
+//        // XOR all the zobrist values for each piece on the board
+//        for (int x = 0; x < board.length; x++)
+//            for (int y = 0; y < board[x].length; y++)
+//                hash ^= zobristTable[x + y*State.BOARD_SIZE + board[x][y]*100];
+//
+//        return hash;
+        return 0;
     }
 
     private static void init() {

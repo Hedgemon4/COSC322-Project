@@ -6,14 +6,13 @@ import java.util.Arrays;
 
 import static State.State.*;
 
-public class BitBoard {
-    // TODO: Need two longs for each item
-    long whiteQueensTop;
-    long whiteQueensBottom;
-    long blackQueensTop;
-    long blackQueensBottom;
-    long arrowTop;
-    long arrowBottom;
+public class BitBoard implements Cloneable {
+    private long whiteQueensTop;
+    private long whiteQueensBottom;
+    private long blackQueensTop;
+    private long blackQueensBottom;
+    private long arrowTop;
+    private long arrowBottom;
 
     public BitBoard() {
         whiteQueensTop = 0L;
@@ -175,5 +174,57 @@ public class BitBoard {
         }
         sb.append("   a b c d e f g h i j");
         return sb.toString();
+    }
+
+    public long getWhiteQueensTop() {
+        return whiteQueensTop;
+    }
+
+    public void setWhiteQueensTop(long whiteQueensTop) {
+        this.whiteQueensTop = whiteQueensTop;
+    }
+
+    public long getWhiteQueensBottom() {
+        return whiteQueensBottom;
+    }
+
+    public void setWhiteQueensBottom(long whiteQueensBottom) {
+        this.whiteQueensBottom = whiteQueensBottom;
+    }
+
+    public long getBlackQueensTop() {
+        return blackQueensTop;
+    }
+
+    public void setBlackQueensTop(long blackQueensTop) {
+        this.blackQueensTop = blackQueensTop;
+    }
+
+    public long getBlackQueensBottom() {
+        return blackQueensBottom;
+    }
+
+    public void setBlackQueensBottom(long blackQueensBottom) {
+        this.blackQueensBottom = blackQueensBottom;
+    }
+
+    public long getArrowTop() {
+        return arrowTop;
+    }
+
+    public void setArrowTop(long arrowTop) {
+        this.arrowTop = arrowTop;
+    }
+
+    public long getArrowBottom() {
+        return arrowBottom;
+    }
+
+    public void setArrowBottom(long arrowBottom) {
+        this.arrowBottom = arrowBottom;
+    }
+
+    public BitBoard clone() throws CloneNotSupportedException {
+        return (BitBoard) super.clone();
     }
 }
