@@ -129,11 +129,11 @@ public class BitBoard {
             return WHITE_QUEEN;
         else if (top && (arrowTop & mask) != 0L)
             return ARROW;
-        else if ((blackQueensBottom & mask) != 0L)
+        else if (!top && (blackQueensBottom & mask) != 0L)
             return BLACK_QUEEN;
-        else if ((whiteQueensBottom & mask) != 0L)
+        else if (!top && (whiteQueensBottom & mask) != 0L)
             return WHITE_QUEEN;
-        else if ((arrowBottom & mask) != 0L)
+        else if (!top && (arrowBottom & mask) != 0L)
             return ARROW;
         else
             return 0;
@@ -147,35 +147,6 @@ public class BitBoard {
                     setPiece(i, j, board[i][j]);
             }
         }
-    }
-
-    public String toBoardString() {
-        System.out.println(Long.toBinaryString(blackQueensTop) + Long.toBinaryString(blackQueensBottom));
-        System.out.println(Long.toBinaryString(whiteQueensTop) + Long.toBinaryString(whiteQueensBottom));
-        System.out.println(Long.toBinaryString(arrowTop) + Long.toBinaryString(arrowBottom));
-        StringBuilder sb = new StringBuilder();
-        sb.append(StringUtils.repeat("-", 20)).append(System.lineSeparator());
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                int pieceType = getPiece(i, j);
-                switch (pieceType) {
-                    case BLACK_QUEEN:
-                        sb.append("B");
-                        break;
-                    case WHITE_QUEEN:
-                        sb.append("W");
-                        break;
-                    case ARROW:
-                        sb.append("X");
-                        break;
-                    default:
-                        sb.append("-");
-                }
-                sb.append(" ");
-            }
-            sb.append(System.lineSeparator());
-        }
-        return sb.toString();
     }
 
     public String boardToString() {
