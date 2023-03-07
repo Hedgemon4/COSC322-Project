@@ -27,38 +27,45 @@ public class MonteCarloTree {
     public Action search() {
         Node tree = root;
         Timer time = new Timer(29.5);
-        while (time.timeLeft()) {
-            Node leaf = select(tree);
+        try {
+            while (time.timeLeft()) {
+                Node leaf = select(tree);
 
-            // Get most promising nodes to simulate
-            Node[] children = ExpansionPolicy.expansionNode(leaf, NUM_TO_EXPAND);
+                // Get most promising nodes to simulate
+                Node[] children = ExpansionPolicy.expansionNode(leaf, NUM_TO_EXPAND);
 
-            // Simulate each child in its own Thread
-            // There should never be zero nodes returned because select() should not have chosen it
-            if (children.length == 0)
-                throw new RuntimeException("HELP, THIS IS BAD");
+                // Simulate each child in its own Thread
+                // There should never be zero nodes returned because select() should not have chosen it
+                if (children.length == 0)
+                    throw new RuntimeException("HELP, THIS IS BAD");
 
-            // Create a list of runnable tasks that will be executed in separate threads
-            List<Callable<Integer>> callables = new ArrayList<>();
-            for (Node child : children)
-                callables.add(() -> Simulate.simulate(child));
+                // Create a list of runnable tasks that will be executed in separate threads
+                List<Callable<Integer>> callables = new ArrayList<>();
+                for (Node child : children)
+                    callables.add(() -> Simulate.simulate(child));
 
-            try {
-                // Execute all tasks. Will block until all threads have returned a value
-                List<Future<Integer>> futures = executor.invokeAll(callables);
+                try {
+                    // Execute all tasks. Will block until all threads have returned a value
+                    List<Future<Integer>> futures = executor.invokeAll(callables);
 
-                // Backpropagate the results
-                for (int i = 0; i < children.length; i++) {
-                    Future<Integer> future = futures.get(i);
-                    int result = future.get();
-                    backPropagate(result, children[i]);
+                    // Backpropagate the results
+                    for (int i = 0; i < children.length; i++) {
+                        Future<Integer> future = futures.get(i);
+                        int result = future.get();
+                        backPropagate(result, children[i]);
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
                 }
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
             }
-        }
+        } catch(NullPointerException ignore) {}
+
         System.out.println("Ran " + getRoot().getTotalPlayouts() + " times");
-        return mostVisitedNode().getAction();
+
+        if(mostVisitedNode()==null)
+            return null;
+        else
+            return mostVisitedNode().getAction();
     }
 
     private Node select(Node tree) {
