@@ -108,6 +108,10 @@ public class Main extends GamePlayer {
                 }
                 state = new State(state, new Action(msgDetails));
                 makeMove();
+                if (ActionGenerator.generateActions(state, colour == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN, depth).size() == 0) {
+                    System.out.println("We won Mr. Stark");
+                }
+
                 break;
             default:
                 assert (false);
@@ -123,8 +127,12 @@ public class Main extends GamePlayer {
     private void makeMonteCarloMove() {
         long start = System.currentTimeMillis();
         monteCarloTree = new MonteCarloTree(state, cValue, colour, depth);
-        Action definitelyTheBestAction = monteCarloTree.search();
 
+        Action definitelyTheBestAction = monteCarloTree.search();
+        if(definitelyTheBestAction==null){
+            System.out.println("OPPONENT WINS!!");
+            System.exit(0);
+        }
         state = new State(state, definitelyTheBestAction);
         getGameClient().sendMoveMessage(definitelyTheBestAction.toServerResponse());
         getGameGUI().updateGameState(definitelyTheBestAction.toServerResponse());
