@@ -5,13 +5,11 @@ import State.ActionGenerator;
 import State.State;
 import State.BitBoard;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.PriorityQueue;
 
 public class ExpansionPolicy {
-    private static final int shiftUp = 10;
-    private static final int shiftRight = 1;
+    private static final int shiftVertical = 10;
+    private static final int shiftHorizontal = 1;
 
     public static Node[] expansionNode(Node node, int numToExpand) {
         return bitBoardLibertyExpansionPolicy(node, numToExpand);
@@ -119,6 +117,7 @@ public class ExpansionPolicy {
 //    }
 
     private static int calculateLiberty(int x, int y, BitBoard board) {
+        // Combine all boards together such that it now represents if there is ANY piece on the board at a given index
         long spaceTop = 0L;
         long spaceBottom = 0L;
         spaceTop |= board.getArrowTop();
@@ -127,6 +126,8 @@ public class ExpansionPolicy {
         spaceBottom |= board.getArrowBottom();
         spaceBottom |= board.getWhiteQueensBottom();
         spaceBottom |= board.getBlackQueensBottom();
+
+
         long currentPositionTop = 0L;
         long currentPositionBottom = 0L;
         long boardLibertiesTop = 0L;
@@ -134,65 +135,69 @@ public class ExpansionPolicy {
         int index = x + y * 10;
         if (index > 49) {
             index -= 50;
-            currentPositionTop |= (currentPositionTop << index);
+            currentPositionTop |= (1L << index);
         } else
-            currentPositionBottom |= (currentPositionBottom << index);
+            currentPositionBottom |= (1L << index);
+
+        // Mask to only show squares adjacent to the specified square
         if (x + 1 < 10) {
             // Right
-            long rightTop = currentPositionTop << shiftRight;
-            long rightBottom = currentPositionBottom << shiftRight;
+            long rightTop = currentPositionTop << shiftHorizontal;
+            long rightBottom = currentPositionBottom << shiftHorizontal;
             boardLibertiesTop |= (rightTop & spaceTop);
             boardLibertiesBottom |= (rightBottom & spaceBottom);
         }
         if (x - 1 > -1) {
             // Left
-            long leftTop = currentPositionTop >> shiftRight;
-            long leftBottom = currentPositionBottom >> shiftRight;
+            long leftTop = currentPositionTop >> shiftHorizontal;
+            long leftBottom = currentPositionBottom >> shiftHorizontal;
             boardLibertiesTop |= (leftTop & spaceTop);
             boardLibertiesBottom |= (leftBottom & spaceBottom);
         }
         if (y + 1 < 10) {
             // Up
-            long upTop = currentPositionTop << shiftUp;
-            long upBottom = currentPositionBottom << shiftUp;
+            long upTop = currentPositionTop << shiftVertical;
+            long upBottom = currentPositionBottom << shiftVertical;
             boardLibertiesTop |= (upTop & spaceTop);
             boardLibertiesBottom |= (upBottom & spaceBottom);
         }
         if (y - 1 > -1) {
             // Down
-            long downTop = currentPositionTop >> shiftUp;
-            long downBottom = currentPositionBottom >> shiftUp;
+            long downTop = currentPositionTop >> shiftVertical;
+            long downBottom = currentPositionBottom >> shiftVertical;
             boardLibertiesTop |= (downTop & spaceTop);
             boardLibertiesBottom |= (downBottom & spaceBottom);
         }
         if (x + 1 < 10 && y + 1 < 10) {
             // Up Right
-            long upRightTop = currentPositionTop << shiftUp + shiftRight;
-            long upRightBottom = currentPositionBottom << shiftUp + shiftRight;
+            long upRightTop = currentPositionTop << shiftVertical + shiftHorizontal;
+            long upRightBottom = currentPositionBottom << shiftVertical + shiftHorizontal;
             boardLibertiesTop |= (upRightTop & spaceTop);
             boardLibertiesBottom |= (upRightBottom & spaceBottom);
         }
         if (x + 1 < 10 && y - 1 > -1) {
             // Down Right
-            long downRightTop = currentPositionTop >> shiftUp - shiftRight;
-            long downRightBottom = currentPositionBottom >> shiftUp - shiftRight;
+            long downRightTop = currentPositionTop >> shiftVertical - shiftHorizontal;
+            long downRightBottom = currentPositionBottom >> shiftVertical - shiftHorizontal;
             boardLibertiesTop |= (downRightTop & spaceTop);
             boardLibertiesBottom |= (downRightBottom & spaceBottom);
         }
         if (x - 1 > -1 && y + 1 < 10) {
             // Up Left
-            long upLeftTop = currentPositionTop << shiftUp - shiftRight;
-            long upLeftBottom = currentPositionBottom << shiftUp - shiftRight;
+            long upLeftTop = currentPositionTop << shiftVertical - shiftHorizontal;
+            long upLeftBottom = currentPositionBottom << shiftVertical - shiftHorizontal;
             boardLibertiesTop |= (upLeftTop & spaceTop);
             boardLibertiesBottom |= (upLeftBottom & spaceBottom);
         }
         if (x - 1 > -1 && y - 1 > -1) {
             // Down Left
-            long downLeftTop = currentPositionTop >> shiftUp + shiftRight;
-            long downLeftBottom = currentPositionBottom >> shiftUp + shiftRight;
+            long downLeftTop = currentPositionTop >> shiftVertical + shiftHorizontal;
+            long downLeftBottom = currentPositionBottom >> shiftVertical + shiftHorizontal;
             boardLibertiesTop |= (downLeftTop & spaceTop);
             boardLibertiesBottom |= (downLeftBottom & spaceBottom);
         }
+
+        // Sum the number of pieces surrounding the given position
         return Long.bitCount(boardLibertiesTop) + Long.bitCount(boardLibertiesBottom);
     }
 
