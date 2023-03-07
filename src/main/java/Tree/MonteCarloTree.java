@@ -58,16 +58,14 @@ public class MonteCarloTree {
                     throw new RuntimeException(e);
                 }
             }
-        } catch(Exception ignore) {}
+        } catch(NullPointerException ignore) {}
 
         System.out.println("Ran " + getRoot().getTotalPlayouts() + " times");
 
-        if(mostVisitedNode()==null){
+        if(mostVisitedNode()==null)
             return null;
-        }
-        else {
+        else
             return mostVisitedNode().getAction();
-        }
     }
 
     private Node select(Node tree) {

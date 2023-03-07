@@ -108,6 +108,10 @@ public class Main extends GamePlayer {
                 }
                 state = new State(state, new Action(msgDetails));
                 makeMove();
+                if (ActionGenerator.generateActions(state, colour == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN, depth).size() == 0) {
+                    System.out.println("We won Mr. Stark");
+                }
+
                 break;
             default:
                 assert (false);
