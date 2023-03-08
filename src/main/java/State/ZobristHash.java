@@ -15,6 +15,7 @@ public class ZobristHash {
      * @return The hash of the state
      */
     public static long hash(State s) {
+        // TODO: Fix this code
 //        if (!initialized)
 //            init();
 //
