@@ -62,7 +62,7 @@ public class ExpansionPolicy {
 
             // Punish moving to a spot with less than 3 liberties
             if (moveLibertyNew < 3)
-                actionWeight -= 40;
+                actionWeight -= 20;
 
             // TODO: Prioritize Reducing enemy liberties
 
@@ -102,17 +102,8 @@ public class ExpansionPolicy {
         spaceBottom |= board.getWhiteQueensBottom();
         spaceBottom |= board.getBlackQueensBottom();
 
-
-        long currentPositionTop = 0L;
-        long currentPositionBottom = 0L;
         long boardLibertiesTop = 0L;
         long boardLibertiesBottom = 0L;
-        int index = x + y * 10;
-        if (index > 49) {
-            index -= 50;
-            currentPositionTop |= (1L << index);
-        } else
-            currentPositionBottom |= (1L << index);
 
         // Mask to only show squares adjacent to the specified square
         int mask = 0;
@@ -121,72 +112,75 @@ public class ExpansionPolicy {
             mask = (x + 1) + y * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= (1L << mask) & spaceTop;
+                // TODO: the subtraction here does not work due to the board orientation
+                long k = 1L;
+                k = k << mask;
+                boardLibertiesTop |= ~(k & spaceTop);
             } else
-                boardLibertiesBottom |= (1L << mask) & spaceBottom;
+                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
         }
         if (x - 1 > -1) {
             // Left
             mask = (x - 1) + y * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= (1L << mask) & spaceTop;
+                boardLibertiesTop |= ~((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= (1L << mask) & spaceBottom;
+                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
         }
         if (y + 1 < 10) {
             // Up
             mask = x + 10 * (y + 1);
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= (1L << mask) & spaceTop;
+                boardLibertiesTop |= ~((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= (1L << mask) & spaceBottom;
+                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
         }
         if (y - 1 > -1) {
             // Down
             mask = x + (y - 1) * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= (1L << mask) & spaceTop;
+                boardLibertiesTop |= ~((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= (1L << mask) & spaceBottom;
+                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
         }
         if (x + 1 < 10 && y + 1 < 10) {
             // Up Right
             mask = x + 1 + (y + 1) * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= (1L << mask) & spaceTop;
+                boardLibertiesTop |= ~((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= (1L << mask) & spaceBottom;
+                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
         }
         if (x + 1 < 10 && y - 1 > -1) {
             // Down Right
             mask = x + 1 + (y - 1) * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= (1L << mask) & spaceTop;
+                boardLibertiesTop |= ~((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= (1L << mask) & spaceBottom;
+                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
         }
         if (x - 1 > -1 && y + 1 < 10) {
             // Up Left
             mask = (x - 1) + (y + 1) * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= (1L << mask) & spaceTop;
+                boardLibertiesTop |= ~((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= (1L << mask) & spaceBottom;
+                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
         }
         if (x - 1 > -1 && y - 1 > -1) {
             // Down Left
             mask = (x - 1) + (y - 1) * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= (1L << mask) & spaceTop;
+                boardLibertiesTop |= ~((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= (1L << mask) & spaceBottom;
+                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
         }
 
         // Sum the number of pieces surrounding the given position

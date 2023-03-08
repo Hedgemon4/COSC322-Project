@@ -6,7 +6,7 @@ public class State implements Cloneable {
     // 0 = empty, 1 = black queen, 2 = white queen, 3 = arrow
     private int[][] blackQueens;
     private int[][] whiteQueens;
-    private BitBoard bitBoard;
+    private BitBoard  bitBoard;
 
     public static final int BOARD_SIZE = 10;
     public static final int WHITE_QUEEN = 2;
@@ -26,8 +26,8 @@ public class State implements Cloneable {
                     blackQueens[blackQueensFound++] = new int[]{i, j};
                 } else if (piece == WHITE_QUEEN) {
                     whiteQueens[whiteQueensFound++] = new int[]{i, j};
-                    bitBoard.setPiece(i, j, gameState.get((j + 1) * 11 + i + 1));
                 }
+                bitBoard.setPiece(i, j, piece);
             }
         }
     }
