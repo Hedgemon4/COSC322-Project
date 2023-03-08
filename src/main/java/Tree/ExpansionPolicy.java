@@ -140,61 +140,78 @@ public class ExpansionPolicy {
             currentPositionBottom |= (1L << index);
 
         // Mask to only show squares adjacent to the specified square
+        int mask = 0;
         if (x + 1 < 10) {
             // Right
-            long rightTop = currentPositionTop << shiftHorizontal;
-            long rightBottom = currentPositionBottom << shiftHorizontal;
-            boardLibertiesTop |= (rightTop & spaceTop);
-            boardLibertiesBottom |= (rightBottom & spaceBottom);
+            mask = (x + 1) + y * 10;
+            if (mask > 49) {
+                mask -= 50;
+                boardLibertiesTop |= (1L << mask) & spaceTop;
+            } else
+                boardLibertiesBottom |= (1L << mask) & spaceBottom;
         }
         if (x - 1 > -1) {
             // Left
-            long leftTop = currentPositionTop >> shiftHorizontal;
-            long leftBottom = currentPositionBottom >> shiftHorizontal;
-            boardLibertiesTop |= (leftTop & spaceTop);
-            boardLibertiesBottom |= (leftBottom & spaceBottom);
+            mask = (x - 1) + y * 10;
+            if (mask > 49) {
+                mask -= 50;
+                boardLibertiesTop |= (1L << mask) & spaceTop;
+            } else
+                boardLibertiesBottom |= (1L << mask) & spaceBottom;
         }
         if (y + 1 < 10) {
             // Up
-            long upTop = currentPositionTop << shiftVertical;
-            long upBottom = currentPositionBottom << shiftVertical;
-            boardLibertiesTop |= (upTop & spaceTop);
-            boardLibertiesBottom |= (upBottom & spaceBottom);
+            mask = x + 10 * (y + 1);
+            if (mask > 49) {
+                mask -= 50;
+                boardLibertiesTop |= (1L << mask) & spaceTop;
+            } else
+                boardLibertiesBottom |= (1L << mask) & spaceBottom;
         }
         if (y - 1 > -1) {
             // Down
-            long downTop = currentPositionTop >> shiftVertical;
-            long downBottom = currentPositionBottom >> shiftVertical;
-            boardLibertiesTop |= (downTop & spaceTop);
-            boardLibertiesBottom |= (downBottom & spaceBottom);
+            mask = x + (y - 1) * 10;
+            if (mask > 49) {
+                mask -= 50;
+                boardLibertiesTop |= (1L << mask) & spaceTop;
+            } else
+                boardLibertiesBottom |= (1L << mask) & spaceBottom;
         }
         if (x + 1 < 10 && y + 1 < 10) {
             // Up Right
-            long upRightTop = currentPositionTop << shiftVertical + shiftHorizontal;
-            long upRightBottom = currentPositionBottom << shiftVertical + shiftHorizontal;
-            boardLibertiesTop |= (upRightTop & spaceTop);
-            boardLibertiesBottom |= (upRightBottom & spaceBottom);
+            mask = x + 1 + (y + 1) * 10;
+            if (mask > 49) {
+                mask -= 50;
+                boardLibertiesTop |= (1L << mask) & spaceTop;
+            } else
+                boardLibertiesBottom |= (1L << mask) & spaceBottom;
         }
         if (x + 1 < 10 && y - 1 > -1) {
             // Down Right
-            long downRightTop = currentPositionTop >> shiftVertical - shiftHorizontal;
-            long downRightBottom = currentPositionBottom >> shiftVertical - shiftHorizontal;
-            boardLibertiesTop |= (downRightTop & spaceTop);
-            boardLibertiesBottom |= (downRightBottom & spaceBottom);
+            mask = x + 1 + (y - 1) * 10;
+            if (mask > 49) {
+                mask -= 50;
+                boardLibertiesTop |= (1L << mask) & spaceTop;
+            } else
+                boardLibertiesBottom |= (1L << mask) & spaceBottom;
         }
         if (x - 1 > -1 && y + 1 < 10) {
             // Up Left
-            long upLeftTop = currentPositionTop << shiftVertical - shiftHorizontal;
-            long upLeftBottom = currentPositionBottom << shiftVertical - shiftHorizontal;
-            boardLibertiesTop |= (upLeftTop & spaceTop);
-            boardLibertiesBottom |= (upLeftBottom & spaceBottom);
+            mask = (x - 1) + (y + 1) * 10;
+            if (mask > 49) {
+                mask -= 50;
+                boardLibertiesTop |= (1L << mask) & spaceTop;
+            } else
+                boardLibertiesBottom |= (1L << mask) & spaceBottom;
         }
         if (x - 1 > -1 && y - 1 > -1) {
             // Down Left
-            long downLeftTop = currentPositionTop >> shiftVertical + shiftHorizontal;
-            long downLeftBottom = currentPositionBottom >> shiftVertical + shiftHorizontal;
-            boardLibertiesTop |= (downLeftTop & spaceTop);
-            boardLibertiesBottom |= (downLeftBottom & spaceBottom);
+            mask = (x - 1) + (y - 1) * 10;
+            if (mask > 49) {
+                mask -= 50;
+                boardLibertiesTop |= (1L << mask) & spaceTop;
+            } else
+                boardLibertiesBottom |= (1L << mask) & spaceBottom;
         }
 
         // Sum the number of pieces surrounding the given position
