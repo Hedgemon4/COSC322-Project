@@ -107,84 +107,93 @@ public class ExpansionPolicy {
 
         // Mask to only show squares adjacent to the specified square
         int mask = 0;
+        int i = 0;
         if (x + 1 < 10) {
             // Right
+            i++;
             mask = (x + 1) + y * 10;
             if (mask > 49) {
                 mask -= 50;
                 // TODO: the subtraction here does not work due to the board orientation
                 long k = 1L;
                 k = k << mask;
-                boardLibertiesTop |= ~(k & spaceTop);
+                boardLibertiesTop |= (k & spaceTop);
             } else
-                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
+                boardLibertiesBottom |= ((1L << mask) & spaceBottom);
         }
         if (x - 1 > -1) {
             // Left
+            i++;
             mask = (x - 1) + y * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= ~((1L << mask) & spaceTop);
+                boardLibertiesTop |= ((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
+                boardLibertiesBottom |= ((1L << mask) & spaceBottom);
         }
         if (y + 1 < 10) {
             // Up
+            i++;
             mask = x + 10 * (y + 1);
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= ~((1L << mask) & spaceTop);
+                boardLibertiesTop |= ((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
+                boardLibertiesBottom |= ((1L << mask) & spaceBottom);
         }
         if (y - 1 > -1) {
             // Down
+            i++;
             mask = x + (y - 1) * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= ~((1L << mask) & spaceTop);
+                boardLibertiesTop |= ((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
+                boardLibertiesBottom |= ((1L << mask) & spaceBottom);
         }
         if (x + 1 < 10 && y + 1 < 10) {
             // Up Right
+            i++;
             mask = x + 1 + (y + 1) * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= ~((1L << mask) & spaceTop);
+                boardLibertiesTop |= ((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
+                boardLibertiesBottom |= ((1L << mask) & spaceBottom);
         }
         if (x + 1 < 10 && y - 1 > -1) {
             // Down Right
+            i++;
             mask = x + 1 + (y - 1) * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= ~((1L << mask) & spaceTop);
+                boardLibertiesTop |= ((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
+                boardLibertiesBottom |= ((1L << mask) & spaceBottom);
         }
         if (x - 1 > -1 && y + 1 < 10) {
             // Up Left
+            i++;
             mask = (x - 1) + (y + 1) * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= ~((1L << mask) & spaceTop);
+                boardLibertiesTop |= ((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
+                boardLibertiesBottom |= ((1L << mask) & spaceBottom);
         }
         if (x - 1 > -1 && y - 1 > -1) {
             // Down Left
+            i++;
             mask = (x - 1) + (y - 1) * 10;
             if (mask > 49) {
                 mask -= 50;
-                boardLibertiesTop |= ~((1L << mask) & spaceTop);
+                boardLibertiesTop |= ((1L << mask) & spaceTop);
             } else
-                boardLibertiesBottom |= ~((1L << mask) & spaceBottom);
+                boardLibertiesBottom |= ((1L << mask) & spaceBottom);
         }
 
         // Sum the number of pieces surrounding the given position
-        return Long.bitCount(boardLibertiesTop) + Long.bitCount(boardLibertiesBottom);
+        return i - (Long.bitCount(boardLibertiesTop) + Long.bitCount(boardLibertiesBottom));
     }
 
     private static int calculateLiberties(int[][] queens, BitBoard bitBoard) {
