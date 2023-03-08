@@ -50,22 +50,41 @@ public class ExpansionPolicy {
             int moveLibertyNew = calculateLiberty(action.getNewX(), action.getNewY(), result.getBitBoard());
             int actionWeight = 0;
 
+            // Promote Moving Away from the edge
+            if (action.getOldX() == 0 || action.getOldX() == 9)
+                if (action.getNewX() != 0 || action.getNewX() != 9)
+                    actionWeight += 20;
+            if (action.getOldY() == 0 || action.getOldY() == 9)
+                if (action.getNewY() == 0 || action.getNewY() == 9)
+                    actionWeight += 20;
+
             // Punish moving to the edge
             if (action.getNewX() == 0 || action.getNewX() == 9)
                 actionWeight -= 50;
             if (action.getNewY() == 0 || action.getNewY() == 9)
                 actionWeight -= 50;
 
+            // Punish Shooting towards the edge of the board
+            if (action.getArrowX() == 0 || action.getArrowX() == 9)
+                actionWeight -= 20;
+            if (action.getArrowY() == 0 || action.getArrowY() == 9)
+                actionWeight -= 20;
+
+            // Promote Moving Towards the Middle
+            if (action.getNewY() > 3 && action.getNewY() < 7)
+                actionWeight += 20;
+            if (action.getNewX() > 1 && action.getNewX() < 8)
+                actionWeight += 20;
+
             // Weight move to escape being trapped
-            if (moveLibertyOld < 3 && moveLibertyNew > 2)
-                actionWeight += 40;
+            if (moveLibertyOld < 5)
+                actionWeight += 10 * (6 - moveLibertyOld);
 
             // Punish moving to a spot with less than 3 liberties
-            if (moveLibertyNew < 3)
+            if (moveLibertyNew < 5)
                 actionWeight -= 20;
 
             // TODO: Prioritize Reducing enemy liberties
-
 
             // Add relevant data to the heap
             topActions.offer(new Object[]{i, actionWeight, result});
@@ -84,7 +103,6 @@ public class ExpansionPolicy {
             Action[] actions = ActionGenerator.generateActions(state, colour, node.getDepth()).toArray(new Action[0]);
             Node expansion = new Node(state, node.getPossibleActions()[pickedActionIndex], node, colour, 0, 0, actions, node.getDepth() + 1);
             node.getChildren()[pickedActionIndex] = expansion;
-
             nodesToReturn.add(expansion);
         }
 
@@ -193,7 +211,8 @@ public class ExpansionPolicy {
         }
 
         // Sum the number of pieces surrounding the given position
-        return i - (Long.bitCount(boardLibertiesTop) + Long.bitCount(boardLibertiesBottom));
+        i -= (Long.bitCount(boardLibertiesTop) + Long.bitCount(boardLibertiesBottom));
+        return i;
     }
 
     private static int calculateLiberties(int[][] queens, BitBoard bitBoard) {
