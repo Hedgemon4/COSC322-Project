@@ -215,31 +215,6 @@ public class ExpansionPolicy {
         return i;
     }
 
-    private static int calculateLiberties(int[][] queens, BitBoard bitBoard) {
-        int liberty = 0;
-        for (int[] queen : queens) {
-            int x = queen[0];
-            int y = queen[1];
-            if (x + 1 < 10)
-                liberty += bitBoard.getPiece(x + 1, y) == 0 ? 1 : 0;
-            if (x - 1 > -1)
-                liberty += bitBoard.getPiece(x - 1, y) == 0 ? 1 : 0;
-            if (y + 1 < 10)
-                liberty += bitBoard.getPiece(x, y + 1) == 0 ? 1 : 0;
-            if (y - 1 > -1)
-                liberty += bitBoard.getPiece(x, y - 1) == 0 ? 1 : 0;
-            if (x + 1 < 10 && y + 1 < 10)
-                liberty += bitBoard.getPiece(x + 1, y + 1) == 0 ? 1 : 0;
-            if (x + 1 < 10 && y - 1 > -1)
-                liberty += bitBoard.getPiece(x + 1, y - 1) == 0 ? 1 : 0;
-            if (x - 1 > -1 && y + 1 < 10)
-                liberty += bitBoard.getPiece(x - 1, y + 1) == 0 ? 1 : 0;
-            if (x - 1 > -1 && y - 1 > -1)
-                liberty += bitBoard.getPiece(x - 1, y - 1) == 0 ? 1 : 0;
-        }
-        return liberty;
-    }
-
     private static int[][] calculateLiberties(int[][] queens, byte[][] board) {
         int[][] liberty = new int[10][10];
         for (int i = 0; i < queens.length; i++) {
