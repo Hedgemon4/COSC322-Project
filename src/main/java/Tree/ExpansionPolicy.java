@@ -78,7 +78,7 @@ public class ExpansionPolicy {
 
             // Weight move to escape being trapped
             if (moveLibertyOld < 5)
-                actionWeight += 10 * (6 - moveLibertyOld);
+                actionWeight += 15 * (6 - moveLibertyOld);
 
             // Punish moving to a spot with less than 3 liberties
             if (moveLibertyNew < 5)
