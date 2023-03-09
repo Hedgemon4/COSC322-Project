@@ -66,10 +66,6 @@ public class State implements Cloneable {
         }
     }
 
-    public long zobristHash() {
-        return ZobristHash.hash(this);
-    }
-
     public int[][] getQueens(int color) {
         if (color == BLACK_QUEEN)
             return blackQueens;
@@ -85,7 +81,7 @@ public class State implements Cloneable {
 
     public Object clone() throws CloneNotSupportedException {
         State clone = (State) super.clone();
-        clone.bitBoard = this.bitBoard.clone();
+        clone.bitBoard = (BitBoard) this.bitBoard.clone();
         clone.blackQueens = new int[this.blackQueens.length][];
         for (int i = 0; i < clone.blackQueens.length; i++) {
             clone.blackQueens[i] = this.blackQueens[i].clone();

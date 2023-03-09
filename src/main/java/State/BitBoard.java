@@ -224,7 +224,7 @@ public class BitBoard implements Cloneable {
         this.arrowBottom = arrowBottom;
     }
 
-    public BitBoard clone() throws CloneNotSupportedException {
-        return (BitBoard) super.clone();
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }
