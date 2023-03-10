@@ -34,8 +34,27 @@ public class Heuristics {
         long potentialMovesUpBottom = 0B1111;
         long potentialMovesDownTop = 0B11111;
         long potentialMovesDownBottom = 0B1111;
-        long potentialMovesUpRightTop ;
+        long potentialMovesUpRightTop = 0B01000000000010000000000100000000001000000000010000000000L;
+        long potentialMovesUpRightBottom = 0B010000000000100000000001000000000010000000000L;
+        long potentialMovesUpLeftTop = 0B0100000000100000000100000000100000000100000000L;
+        long potentialMovesUpLeftBottom = 0B0100000000100000000100000000100000000L;
+        long potentialMovesDownRightTop = 0B010000000000100000000001000000000010000000000L;
+        long potentialMovesDownRightBottom = 0B01000000000010000000000100000000001000000000010000000000L;
+        long potentialMovesDownLeftTop = 0B0100000000100000000100000000100000000100000000L;
+        long potentialMovesDownLeftBottom = 0B0100000000100000000100000000100000000L;
 
-        return moves;
+        int mask = 0;
+
+        // Computer Moves Left
+        if (x - 1 > -1) {
+            potentialMovesLeft = potentialMovesLeft >> (9 - x);
+            potentialMovesLeft = potentialMovesLeft << (index - 1);
+            if (top)
+                potentialMovesTop |= potentialMovesLeft & spaceTop;
+            else
+                potentialMovesBottom |= potentialMovesLeft & spaceBottom;
+        }
+
+        return (Long.bitCount(potentialMovesTop) + Long.bitCount(potentialMovesBottom));
     }
 }
