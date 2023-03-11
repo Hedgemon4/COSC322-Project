@@ -69,6 +69,7 @@ public class ActionChecker {
     }
 
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean inBounds(int x, int y) {
         return x >= 0 && x < State.BOARD_SIZE &&
                 y >= 0 && y < State.BOARD_SIZE;
