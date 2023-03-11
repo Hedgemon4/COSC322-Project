@@ -43,18 +43,40 @@ public class Heuristics {
         long potentialMovesDownLeftTop = 0B0100000000100000000100000000100000000100000000L;
         long potentialMovesDownLeftBottom = 0B0100000000100000000100000000100000000L;
 
-        int mask = 0;
-
+        long mask = 0;
         // Computer Moves Left
         if (x - 1 > -1) {
-            potentialMovesLeft = potentialMovesLeft >> (9 - x);
-            potentialMovesLeft = potentialMovesLeft << (index - 1);
-            if (top)
-                potentialMovesTop |= potentialMovesLeft & spaceTop;
-            else
-                potentialMovesBottom |= potentialMovesLeft & spaceBottom;
+            // Calculate the number of possible moves left
+            potentialMovesLeft = potentialMovesLeft >> 9 - x;
+            // Shift bits to correct position on board
+            potentialMovesLeft = potentialMovesLeft << index - x;
+            // And with space bottom to get occupied tiles
+            potentialMovesLeft = potentialMovesLeft & (top ? spaceTop: spaceBottom);
+            potentialMovesLeft = potentialMovesLeft >> index - x;
+            int i = 0;
+            mask = 1L << x - 1;
+            while (i < x && (potentialMovesLeft & mask) == 0) {
+                moves++;
+                i++;
+                mask = mask >> 1;
+            }
         }
-
-        return (Long.bitCount(potentialMovesTop) + Long.bitCount(potentialMovesBottom));
+        if (x + 1 < 10) {
+            // Calculate the number of possible moves right
+            potentialMovesRight = potentialMovesRight >> x;
+            // Shift bits to correct position on board
+            potentialMovesRight = potentialMovesRight << index + 1;
+            // And with space bottom to get occupied tiles
+            potentialMovesRight = potentialMovesRight & (top ? spaceTop: spaceBottom);
+            potentialMovesRight = potentialMovesRight >> index + 1;
+            int i = 0;
+            mask = 1L << x - 1;
+            while (i < x && (potentialMovesRight & mask) == 0) {
+                moves++;
+                i++;
+                mask = mask >> 1;
+            }
+        }
+        return moves;
     }
 }
