@@ -43,7 +43,7 @@ public class Action {
      * @param arrowX The x position of the arrow
      * @param arrowY The y position of the arrow
      */
-    Action(int oldX, int oldY, int newX, int newY, int arrowX, int arrowY) {
+    public Action(int oldX, int oldY, int newX, int newY, int arrowX, int arrowY) {
         this.oldX = oldX;
         this.oldY = oldY;
         this.newX = newX;

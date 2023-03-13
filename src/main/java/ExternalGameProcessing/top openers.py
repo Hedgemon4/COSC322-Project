@@ -1,6 +1,6 @@
 ########################################################
 # Run via terminal with:
-# python "src/main/java/opening_moves/top openers.py"
+# python "src/main/java/ExternalGameProcessing/top openers.py"
 # Might need to install matplotlib via "pip install matplotlib"
 ########################################################
 
@@ -9,7 +9,7 @@ import csv
 # Create a dictionary to store the number of times each move is made
 moveCount = {}
 # Open the csv file
-with open('src/main/java/opening_moves/parsed_games.csv', 'r') as f:
+with open('bin/training/parsed_games.csv', 'r') as f:
     # Create a csv reader object
     reader = csv.reader(f)
     # Skip the header

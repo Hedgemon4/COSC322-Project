@@ -1,6 +1,6 @@
 # ########################################################
 # # Run via terminal with:
-# # python "src/main/java/opening_moves/common first 4.py"
+# # python "src/main/java/ExternalGameProcessing/common first 4.py"
 # ########################################################
 
 import csv
@@ -10,7 +10,7 @@ import csv
 moveCount = {}
 totalGames = 0
 # Open the csv file
-with open('src/main/java/opening_moves/parsed_games.csv', 'r') as f:
+with open('bin/training/parsed_games.csv', 'r') as f:
     # Create a csv reader object
     reader = csv.reader(f)
     # Skip the header
