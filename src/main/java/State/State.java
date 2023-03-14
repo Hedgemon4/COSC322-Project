@@ -1,8 +1,9 @@
 package State;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class State implements Cloneable {
+public class State implements Cloneable, Serializable {
     // 0 = empty, 1 = black queen, 2 = white queen, 3 = arrow
     private byte[][] board;
     private int[][] blackQueens;
