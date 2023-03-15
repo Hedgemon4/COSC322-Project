@@ -52,8 +52,8 @@ public class ActionChecker {
         if (xDirection != 0) xDirection /= Math.abs(xDirection);
         if (yDirection != 0) yDirection /= Math.abs(yDirection);
 
-        checkX = action.getNewX() + xDirection;
-        checkY = action.getNewY() + yDirection;
+         checkX = action.getNewX() + xDirection;
+         checkY = action.getNewY() + yDirection;
 
         // If there was a piece between the new pos and the arrow that isn't just the old piece
         while (!((xDirection != 0 && checkX == action.getArrowX()) || (yDirection != 0 && checkY == action.getArrowY()))) {
@@ -67,6 +67,7 @@ public class ActionChecker {
 
         return true;
     }
+
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean inBounds(int x, int y) {
