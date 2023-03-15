@@ -83,21 +83,22 @@ public class ActionGenerator {
             }
         }
 
-        if (depth <= STARTING_MOVES_DEPTH) {
-            ArrayList<Action> out = new ArrayList<>();
-            if (color == State.BLACK_QUEEN) {
-                for (Action action : moves)
-                    if (action.getArrowY() <= 4)
-                        out.add(action);
-            } else {
-                for (Action action : moves)
-                    if (action.getArrowY() >= 5)
-                        out.add(action);
-            }
-            return out;
-        } else {
-            return moves;
-        }
+//        if (depth <= STARTING_MOVES_DEPTH) {
+//            ArrayList<Action> out = new ArrayList<>();
+//            if (color == State.BLACK_QUEEN) {
+//                for (Action action : moves)
+//                    if (action.getArrowY() <= 4)
+//                        out.add(action);
+//            } else {
+//                for (Action action : moves)
+//                    if (action.getArrowY() >= 5)
+//                        out.add(action);
+//            }
+//            return out;
+//        } else {
+//            return moves;
+//        }
+        return moves;
     }
 
     private static ArrayList<Action> getActionsFromNewQueenPos(int oldX, int oldY, int newX, int newY, State state) {
