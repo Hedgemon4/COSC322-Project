@@ -5,6 +5,7 @@ import State.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MonteCarloTree {
     private final double cValue;
@@ -40,18 +41,19 @@ public class MonteCarloTree {
                     throw new RuntimeException("HELP, THIS IS BAD");
 
                 // Create a list of runnable tasks that will be executed in separate threads
-                List<Callable<Integer>> callables = new ArrayList<>();
+                List<Callable<double[]>> callables = new ArrayList<>();
+                AtomicInteger threadNum = new AtomicInteger();
                 for (Node child : children)
-                    callables.add(() -> Simulate.simulate(child));
+                    callables.add(() -> Simulate.simulate(child, threadNum.getAndIncrement()));
 
                 try {
                     // Execute all tasks. Will block until all threads have returned a value
-                    List<Future<Integer>> futures = executor.invokeAll(callables);
+                    List<Future<double[]>> futures = executor.invokeAll(callables);
 
                     // Backpropagate the results
                     for (int i = 0; i < children.length; i++) {
-                        Future<Integer> future = futures.get(i);
-                        int result = future.get();
+                        Future<double[]> future = futures.get(i);
+                        double[] result = future.get();
                         backPropagate(result, children[i]);
                     }
                 } catch (InterruptedException | ExecutionException e) {
@@ -82,22 +84,14 @@ public class MonteCarloTree {
      * @param result The player that won. Either State.BLACK or State.WHITE
      * @param child  The child node that was just simulated
      */
-    private void backPropagate(int result, Node child) {
-        if (child.getColour() != result) {
-            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-            child.setTotalWins(child.getTotalWins() + 1);
-        } else {
-            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-        }
+    private void backPropagate(double[] result, Node child) {
+        child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+        child.setTotalWins(child.getTotalWins() + result[child.getColour() - 1]);
 
         while (child.getParent() != null) {
             child = child.getParent();
-            if (child.getColour() != result) {
-                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-                child.setTotalWins(child.getTotalWins() + 1);
-            } else {
-                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-            }
+            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+            child.setTotalWins(child.getTotalWins() + result[child.getColour() - 1]);
         }
     }
 
@@ -133,7 +127,7 @@ public class MonteCarloTree {
     }
 
     private double UCBEquation(Node n) {
-        return (double) n.getTotalWins() / n.getTotalPlayouts() + cValue * Math.sqrt(Math.log((double) n.getParent().getTotalPlayouts() / n.getTotalPlayouts()));
+        return n.getTotalWins() / n.getTotalPlayouts() + cValue * Math.sqrt(Math.log((double) n.getParent().getTotalPlayouts() / n.getTotalPlayouts()));
     }
 
     public Node getRoot() {

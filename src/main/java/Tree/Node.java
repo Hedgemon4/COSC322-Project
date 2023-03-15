@@ -7,7 +7,7 @@ import State.State;
 import java.util.Arrays;
 
 public class Node {
-    private int totalWins;
+    private double totalWins;
     private int totalPlayouts;
     private Node parent;
     private Node[] children;
@@ -69,11 +69,11 @@ public class Node {
         return possibleActions;
     }
 
-    public int getTotalWins() {
+    public double getTotalWins() {
         return totalWins;
     }
 
-    public void setTotalWins(int totalWins) {
+    public void setTotalWins(double totalWins) {
         this.totalWins = totalWins;
     }
 
