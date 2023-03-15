@@ -69,11 +69,11 @@ public class Heuristics {
             // And with space bottom to get occupied tiles
             potentialMovesRight = potentialMovesRight & (top ? spaceTop: spaceBottom);
             potentialMovesRight = potentialMovesRight >> index + 1;
-            int i = 0;
-            mask = 1L << x - 1;
-            while (i < x && (potentialMovesRight & mask) == 0) {
+            int i = 9;
+            mask = 1L << x;
+            while (i > x && (potentialMovesRight & mask) == 0) {
                 moves++;
-                i++;
+                i--;
                 mask = mask >> 1;
             }
         }
