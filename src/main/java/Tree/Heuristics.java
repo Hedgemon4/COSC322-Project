@@ -43,40 +43,26 @@ public class Heuristics {
         long potentialMovesDownLeftTop = 0B0100000000100000000100000000100000000100000000L;
         long potentialMovesDownLeftBottom = 0B0100000000100000000100000000100000000L;
 
-        long mask = 0;
-        // Computer Moves Left
-        if (x - 1 > -1) {
-            // Calculate the number of possible moves left
-            potentialMovesLeft = potentialMovesLeft >> 9 - x;
-            // Shift bits to correct position on board
-            potentialMovesLeft = potentialMovesLeft << index - x;
-            // And with space bottom to get occupied tiles
-            potentialMovesLeft = potentialMovesLeft & (top ? spaceTop: spaceBottom);
-            potentialMovesLeft = potentialMovesLeft >> index - x;
-            int i = 0;
-            mask = 1L << x - 1;
-            while (i < x && (potentialMovesLeft & mask) == 0) {
-                moves++;
-                i++;
-                mask = mask >> 1;
-            }
-        }
-        if (x + 1 < 10) {
-            // Calculate the number of possible moves right
-            potentialMovesRight = potentialMovesRight >> x;
-            // Shift bits to correct position on board
-            potentialMovesRight = potentialMovesRight << index + 1;
-            // And with space bottom to get occupied tiles
-            potentialMovesRight = potentialMovesRight & (top ? spaceTop: spaceBottom);
-            potentialMovesRight = potentialMovesRight >> index + 1;
-            int i = 9;
-            mask = 1L << x;
-            while (i > x && (potentialMovesRight & mask) == 0) {
-                moves++;
-                i--;
-                mask = mask >> 1;
-            }
-        }
+        /*
+            The strategy is to find the least significant bit set to one, subtract one, and then sum the number
+            of ones
+
+            Formula:
+                - Get all 1 bits after least significant one (n & ~(n - 1)) - 1
+                - AND with mask again
+         */
+
+        // Right and Up are least significant bit
+        // Down and left are the most significant bit
+
+        // Compute Moves Left
+
+        long mask = potentialMovesLeft >> (9 - x);
+        long left = mask << (index - x);
+        left &= top ? spaceTop: spaceBottom;
+        left &=  ~(left - 1);
+        left -= 1;
+        moves += Long.bitCount(left & mask);
         return moves;
     }
 }
