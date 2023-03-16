@@ -59,10 +59,33 @@ public class Heuristics {
 
         long mask = potentialMovesLeft >> (9 - x);
         long left = mask << (index - x);
-        left &= top ? spaceTop: spaceBottom;
-        left &=  ~(left - 1);
-        left -= 1;
-        moves += Long.bitCount(left & mask);
+        left &= top ? spaceTop : spaceBottom;
+        if (left != 0) {
+            int k = (int) Math.floor(Math.log(left) / Math.log(2)) + 1;
+            moves += x - k - (y * 10);
+        } else {
+            moves += x;
+        }
+
+        // Compute Moves Right
+
+        mask = potentialMovesRight >> x;
+        long right = mask << index + 1;
+        right &= top ? spaceTop : spaceBottom;
+        if (right != 0) {
+            right &=  ~(right - 1);
+            right -= 1;
+            moves += Long.bitCount(right & mask);
+        } else {
+            moves += 9 - x;
+        }
+
+//        long mask = potentialMovesLeft >> (9 - x);
+//        long left = mask << (index - x);
+//        left &= top ? spaceTop: spaceBottom;
+//        left &=  ~(left - 1);
+//        left -= 1;
+//        moves += Long.bitCount(left & mask);
         return moves;
     }
 }
