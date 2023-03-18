@@ -34,6 +34,8 @@ if __name__ == '__main__':
     print('Parsing training data', end='')
     for i, filename in enumerate(os.listdir('../../../../bin/training/ideal_moves')):
         print('.', end='')
+        # if i ==1:
+        #     break
         with open('../../../../bin/training/ideal_moves/' + filename, 'r') as file:
             for line in file:
                 start, old_queen, new_queen, arrow = line.strip().split('\t')
@@ -55,7 +57,7 @@ if __name__ == '__main__':
     model = default_model()
 
     # Fit model
-    while datetime.datetime.now() < datetime.datetime(2023, 3, 4, 6, 30):
+    while datetime.datetime.now() < datetime.datetime(2023, 3, 18, 6, 30):
         model.fit(train_x, train_y, epochs=5, batch_size=64, validation_split=0.1)
 
     # Save model
