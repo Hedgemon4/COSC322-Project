@@ -3,44 +3,42 @@ package OpeningMoves;
 import State.Action;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class GenerateMoveDictionary {
     public static void main(String[] args) {
         String line = "";
         String splitBy = ",";
-
-        HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> moveDictionary = new HashMap<>();
-        for (int i = 0; i < 100; i ++){
-            moveDictionary.put(i, new HashMap<>());
-            for (int j = 0; j < 100; j++) {
-                moveDictionary.get(i).put(j, new HashMap<>());
-                for (int k = 0; k < 100; k++)
-                    moveDictionary.get(i).get(j).put(k, 0);
-            }
-        }
+        int[] moveDictionary = new int[1000000];
         try {
             BufferedReader br = new BufferedReader(new FileReader("bin/training/parsed_games.csv"));
             while ((line = br.readLine()) != null) {
                 String[] array = line.split(splitBy);
                 if (array.length < 26)
                     continue;
-                for (int i = 1; i < 11; i++){
+                for (int i = 1; i < 11; i++) {
                     Action output = parseMove(array[i]);
+                    StringBuilder sb = new StringBuilder();
                     int index = output.getOldX() + output.getOldY() * 10;
                     int move = output.getNewX() + output.getNewY() * 10;
                     int arrow = output.getArrowX() + output.getArrowY() * 10;
-                    int l = moveDictionary.get(index).get(move).get(arrow) + 1;
-
-                    moveDictionary.get(index).get(move).put(arrow, l);
+                    sb.append(arrow < 10 ? "0" : "").append(arrow);
+                    sb.append(move < 10 ? "0" : "").append(move);
+                    sb.append(index < 10 ? "0" : "").append(index);
+                    moveDictionary[Integer.parseInt(sb.toString())] += 1;
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        for (int i = 0; i < 100; i++)
+            for (int j = 0; j < 100; j++) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(j < 10? "0" : "").append(j).append(i < 10 ? "0" : "").append(i).append("03");
+                int output = moveDictionary[Integer.parseInt(sb.toString())];
+                if (output != 0)
+                    System.out.println("X: " + i / 10  + " Y: " + i % 10 + " Num: " + output);
+            }
     }
 
     private static Action parseMove(String move) {
