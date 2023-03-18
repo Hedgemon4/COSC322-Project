@@ -28,17 +28,13 @@ public class GenerateMoveDictionary {
                     moveDictionary[Integer.parseInt(sb.toString())] += 1;
                 }
             }
+            FileOutputStream fileOutputStream = new FileOutputStream("bin/training/moveDictionary.ser");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(moveDictionary);
+            objectOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < 100; i++)
-            for (int j = 0; j < 100; j++) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(j < 10? "0" : "").append(j).append(i < 10 ? "0" : "").append(i).append("03");
-                int output = moveDictionary[Integer.parseInt(sb.toString())];
-                if (output != 0)
-                    System.out.println("X: " + i / 10  + " Y: " + i % 10 + " Num: " + output);
-            }
     }
 
     private static Action parseMove(String move) {
