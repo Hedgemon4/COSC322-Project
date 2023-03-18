@@ -6,7 +6,7 @@ import Tree.Heuristics;
 public class HeuristicTesting {
     public static void main(String[] args) {
         BitBoard board = new BitBoard();
-        board.setPiece(8, 0, 1);
-        System.out.println(Heuristics.calculateTileControl(4, 0, board));
+        board.setPiece(6, 0, 1);
+        System.out.println(Heuristics.calculateTileControl(2, 0, board));
     }
 }

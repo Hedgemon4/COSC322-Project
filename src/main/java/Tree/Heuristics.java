@@ -75,17 +75,14 @@ public class Heuristics {
         if (right != 0) {
             right &=  ~(right - 1);
             right -= 1;
+            right = right >> x + 1;
             moves += Long.bitCount(right & mask);
         } else {
             moves += 9 - x;
         }
 
-//        long mask = potentialMovesLeft >> (9 - x);
-//        long left = mask << (index - x);
-//        left &= top ? spaceTop: spaceBottom;
-//        left &=  ~(left - 1);
-//        left -= 1;
-//        moves += Long.bitCount(left & mask);
+        // Compute Moves Up
+
         return moves;
     }
 }
