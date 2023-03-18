@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import keras.models
@@ -54,7 +55,8 @@ if __name__ == '__main__':
     model = default_model()
 
     # Fit model
-    model.fit(train_x, train_y, epochs=200, batch_size=64, validation_split=0.1)
+    while datetime.datetime.now() < datetime.datetime(2023, 3, 4, 6, 30):
+        model.fit(train_x, train_y, epochs=5, batch_size=64, validation_split=0.1)
 
     # Save model
     model.save('../../../../bin/models/full_model2.h5')  # save everything in HDF5 format

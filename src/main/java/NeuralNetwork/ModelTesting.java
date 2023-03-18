@@ -1,6 +1,8 @@
 package NeuralNetwork;
 
 import State.State;
+import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
 import org.deeplearning4j.nn.modelimport.keras.exceptions.InvalidKerasConfigurationException;
 import org.deeplearning4j.nn.modelimport.keras.exceptions.UnsupportedKerasConfigurationException;
@@ -11,20 +13,20 @@ import org.nd4j.linalg.factory.Nd4j;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
 
 public class ModelTesting {
     public static void main(String[] args) throws IOException, UnsupportedKerasConfigurationException, InvalidKerasConfigurationException {
 
-        MultiLayerNetwork model = KerasModelImport.importKerasSequentialModelAndWeights(Files.newInputStream(Paths.get("bin/models/model1.h5")));
+//        MultiLayerNetwork model = KerasModelImport.importKerasSequentialModelAndWeights(Files.newInputStream(Paths.get("bin/models/model2.h5")));
+        ComputationGraph model = KerasModelImport.importKerasModelAndWeights("bin/models/full_model2.h5", new int[]{10,10,3}, false);
+
 
         State nodeState = new State(new ArrayList<>(Arrays.asList(
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0,
                 0, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0,
-                0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0,
+                0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -49,8 +51,12 @@ public class ModelTesting {
         }
 
         // Get the output of the model
-        double[] result = model.output(input).data().getDoublesAt(0,2);;
-        System.out.println(Arrays.toString(result));
+        INDArray[] output = model.output(input);
+
+        System.out.printf("%-10s | %-10s | %-10s\n-----------+------------+-----------\n", "Old Queen", "New Queen", "Arrow");
+        for (int i = 0; i < output[0].shape()[1]; i++)
+            System.out.printf("%-10.2f | %-10.2f | %-10.2f\n", output[0].getDouble(0, i), output[1].getDouble(0, i), output[2].getDouble(0, i));
+
     }
 
     static INDArray randomBoard() {
