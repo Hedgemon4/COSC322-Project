@@ -5,16 +5,22 @@ import State.Action;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class GenerateMoveDictionary {
     public static void main(String[] args) {
         String line = "";
         String splitBy = ",";
-        HashMap<Integer, HashMap<Integer, ArrayList<Action>>> moveDictionary = new HashMap<>();
+
+        HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> moveDictionary = new HashMap<>();
         for (int i = 0; i < 100; i ++){
             moveDictionary.put(i, new HashMap<>());
-            for (int j = 0; j < 100; j++)
-                moveDictionary.get(i).put(j, new ArrayList<>());
+            for (int j = 0; j < 100; j++) {
+                moveDictionary.get(i).put(j, new HashMap<>());
+                for (int k = 0; k < 100; k++)
+                    moveDictionary.get(i).get(j).put(k, 0);
+            }
         }
         try {
             BufferedReader br = new BufferedReader(new FileReader("bin/training/parsed_games.csv"));
@@ -26,10 +32,12 @@ public class GenerateMoveDictionary {
                     Action output = parseMove(array[i]);
                     int index = output.getOldX() + output.getOldY() * 10;
                     int move = output.getNewX() + output.getNewY() * 10;
-                    moveDictionary.get(index).get(move).add(output);
+                    int arrow = output.getArrowX() + output.getArrowY() * 10;
+                    int l = moveDictionary.get(index).get(move).get(arrow) + 1;
+
+                    moveDictionary.get(index).get(move).put(arrow, l);
                 }
             }
-            System.out.println(moveDictionary.get(3));
         } catch (IOException e) {
             e.printStackTrace();
         }
