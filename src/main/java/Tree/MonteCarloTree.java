@@ -109,7 +109,6 @@ public class MonteCarloTree {
         int[][] queens = this.root.getState().getQueens(this.root.getColour());
         int max = 0;
         int maxIndex = 0;
-        int queenIndex = 0;
         for (int s = 0; s < 4; s++) {
             int x = queens[s][0];
             int y = queens[s][1];
@@ -124,7 +123,6 @@ public class MonteCarloTree {
                     if (num > max) {
                         maxIndex = index;
                         max = num;
-                        queenIndex = s;
                     }
                 }
             }
