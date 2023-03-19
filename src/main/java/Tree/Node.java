@@ -5,6 +5,7 @@ import State.ActionGenerator;
 import State.State;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Node {
     private int totalWins;
@@ -15,7 +16,6 @@ public class Node {
     private State state;
     private Action action;
     private int colour;
-
     private int depth;
 
     public Node(State state, Action action, int colour, int depth) {
@@ -143,5 +143,25 @@ public class Node {
                 ", colour=" + colour +
                 ", depth=" + depth +
                 '}';
+    }
+
+    /*
+        Note that the following equals and hashCode methods only check the state, action, colour, and depth values.
+        This should be used for ONLY for resetting the tree node, not any other comparison.
+
+        TODO: Extract to another class and apply only on updates
+     */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Node node = (Node) o;
+        return colour == node.colour && depth == node.depth && Objects.equals(state, node.state) && Objects.equals(action, node.action);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(state, action, colour, depth);
     }
 }

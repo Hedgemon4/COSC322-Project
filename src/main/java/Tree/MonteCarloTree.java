@@ -33,6 +33,10 @@ public class MonteCarloTree {
     public Action search() {
         Node tree = root;
         Timer time = new Timer(29.5);
+        /*
+            At the start of the game, we use a move dictionary to find out move, and then we use the saved time to start
+            searching our tree.
+         */
         boolean useMoveDictionary = root.getDepth() < 8;
         if (useMoveDictionary) {
             return getMoveDictionaryMove();
@@ -58,7 +62,7 @@ public class MonteCarloTree {
                     // Execute all tasks. Will block until all threads have returned a value
                     List<Future<Integer>> futures = executor.invokeAll(callables);
 
-                    // Backpropagate the results
+                    // Backpropagation of results
                     for (int i = 0; i < children.length; i++) {
                         Future<Integer> future = futures.get(i);
                         int result = future.get();
@@ -175,10 +179,15 @@ public class MonteCarloTree {
     }
 
     private PriorityQueue<int[]> getDictionaryMoves(int[][] queens) {
+        /*
+            Gets the most common actions made from our move dictionary for the queens specified in the input array. The
+            priority queue sorts based on the action weight (how often it is used).
+         */
         PriorityQueue<int[]> topActions = new PriorityQueue<>((o1, o2) -> (o2[0]) - (o1[0]));
         for (int[] queen : queens) {
             int x = queen[0];
             int y = queen[1];
+            // Parse through all the possible actions
             for (int i = 0; i < 100; i++) {
                 for (int j = 0; j < 100; j++) {
                     StringBuilder sb = new StringBuilder();
@@ -187,6 +196,11 @@ public class MonteCarloTree {
                     sb.append(y == 0 ? "0" + x : x + y * 10);
                     int index = Integer.parseInt(sb.toString());
                     int num = moveDictionary[index];
+                    /*
+                        The index is formatted AANNOO where OO is the old index, NN is the new index, and AA is the
+                        index of the arrow shot. AS such, we need to extract and convert each number which is an int
+                        from 0 to 99 into an (x,y) coordinates
+                     */
                     int oldX = index % 10;
                     int oldY = (index % 100) / 10;
                     int newX = (index % 1000) / 100;
@@ -198,6 +212,19 @@ public class MonteCarloTree {
             }
         }
         return topActions;
+    }
+
+    public void updateRoot(State state, Action action, int colour, int depth) {
+        /*
+            Updates the root of the tree to either be a child of the old root if it was in the old tree, or the newly
+            created node if not.
+         */
+        Node updatedRoot = new Node(state, action, colour, depth);
+        int index = Arrays.asList(root.getChildren()).indexOf(updatedRoot);
+        if (index == -1)
+            root = updatedRoot;
+        else
+            root = root.getChildren()[index];
     }
 
     public Node getRoot() {
