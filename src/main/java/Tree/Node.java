@@ -23,7 +23,7 @@ public class Node {
         this.action = action;
         this.colour = colour;
         this.depth = depth;
-        possibleActions = ActionGenerator.generateActions(state, colour, depth).toArray(new Action[0]);
+        possibleActions = ActionGenerator.generateActions(state, colour).toArray(new Action[0]);
         children = new Node[possibleActions.length];
     }
 

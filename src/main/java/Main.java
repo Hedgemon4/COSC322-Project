@@ -119,7 +119,7 @@ public class Main extends GamePlayer {
                 }
                 state = new State(state, opponentAction);
                 makeMove();
-                if (ActionGenerator.generateActions(state, colour == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN, depth).size() == 0) {
+                if (ActionGenerator.generateActions(state, colour == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN).size() == 0) {
                     System.out.println("We won Mr. Stark");
                 }
 
@@ -157,7 +157,7 @@ public class Main extends GamePlayer {
 
     private void makeRandomMove() {
         long start = System.nanoTime();
-        ArrayList<Action> actions = ActionGenerator.generateActions(state, colour, depth);
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, colour);
         Action selectedAction = actions.get((int) (Math.random() * actions.size()));
         state = new State(state, selectedAction);
         getGameClient().sendMoveMessage(selectedAction.toServerResponse());
