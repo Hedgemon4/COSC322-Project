@@ -8,6 +8,10 @@ import ygraph.ai.smartfox.games.GamePlayer;
 import ygraph.ai.smartfox.games.amazons.AmazonsGameMessage;
 import ygraph.ai.smartfox.games.amazons.HumanPlayer;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -27,7 +31,7 @@ public class Main extends GamePlayer {
     private MonteCarloTree monteCarloTree;
     private final double cValue = 2.0;
     private int depth = 0;
-
+    private static int[] moveDictionary;
 
     /**
      * A test main method
@@ -46,6 +50,14 @@ public class Main extends GamePlayer {
         } else {
             BaseGameGUI.sys_setup();
             java.awt.EventQueue.invokeLater(player::Go);
+        }
+
+        // Load Move Dictionary
+        try {
+            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("bin/training/moveDictionary.ser"));
+            moveDictionary = (int[]) objectInputStream.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -87,7 +99,7 @@ public class Main extends GamePlayer {
                 // If we are black, we move first
                 boolean isBlack = msgDetails.get(AmazonsGameMessage.PLAYER_BLACK).equals(getGameClient().getUserName());
                 colour = isBlack ? State.BLACK_QUEEN : State.WHITE_QUEEN;
-                monteCarloTree = new MonteCarloTree(state, cValue, colour, depth);
+                monteCarloTree = new MonteCarloTree(state, cValue, colour, depth, moveDictionary);
                 if (isBlack)
                     makeMove();
                 break;
@@ -122,7 +134,7 @@ public class Main extends GamePlayer {
 
     private void makeMonteCarloMove() {
         long start = System.currentTimeMillis();
-        monteCarloTree = new MonteCarloTree(state, cValue, colour, depth);
+        monteCarloTree = new MonteCarloTree(state, cValue, colour, depth, moveDictionary);
         Action definitelyTheBestAction = monteCarloTree.search();
 
         state = new State(state, definitelyTheBestAction);

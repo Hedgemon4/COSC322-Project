@@ -5,23 +5,32 @@ import State.*;
 public class MonteCarloTree {
     private final double cValue;
     private Node root;
+    private final int[] moveDictionary;
 
-    public MonteCarloTree(State state, double cValue, int colour, int depth) {
+    public MonteCarloTree(State state, double cValue, int colour, int depth, int[] moveDictionary) {
         this.cValue = cValue;
         root = new Node(state, colour, depth);
+        this.moveDictionary = moveDictionary;
     }
 
     public Action search() {
         Node tree = root;
         Timer time = new Timer(29.5);
-        while (time.timeLeft()) {
-            Node leaf = select(tree);
-            Node child = expand(leaf);
-            int result = Simulate.simulate(child);
-            backPropagate(result, child);
+        boolean useMoveDictionary = root.getDepth() < 6;
+        Action selected;
+        if (useMoveDictionary) {
+            selected = moveDictionaryMove();
+            return selected;
+        } else {
+            while (time.timeLeft()) {
+                Node leaf = select(tree);
+                Node child = expand(leaf);
+                int result = Simulate.simulate(child);
+                backPropagate(result, child);
+            }
+            System.out.println("Ran " + getRoot().getTotalPlayouts() + " times");
+            return mostVisitedNode().getAction();
         }
-        System.out.println("Ran " + getRoot().getTotalPlayouts() + " times");
-        return mostVisitedNode().getAction();
     }
 
     private Node select(Node tree) {
@@ -94,6 +103,39 @@ public class MonteCarloTree {
 
     private double UCBEquation(Node n) {
         return (double) n.getTotalWins() / n.getTotalPlayouts() + cValue * Math.sqrt(Math.log((double) n.getParent().getTotalPlayouts() / n.getTotalPlayouts()));
+    }
+
+    private Action moveDictionaryMove() {
+        int[][] queens = this.root.getState().getQueens(this.root.getColour());
+        int max = 0;
+        int maxIndex = 0;
+        int queenIndex = 0;
+        for (int s = 0; s < 4; s++) {
+            int x = queens[s][0];
+            int y = queens[s][1];
+            for (int i = 0; i < 100; i++) {
+                for (int j = 0; j < 100; j++) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(j < 10 ? "0" + j : j + "");
+                    sb.append(i < 10 ? "0" + i : i + "");
+                    sb.append(y == 0 ? "0" + x : x + y * 10);
+                    int index = Integer.parseInt(sb.toString());
+                    int num = moveDictionary[index];
+                    if (num > max) {
+                        maxIndex = index;
+                        max = num;
+                        queenIndex = s;
+                    }
+                }
+            }
+        }
+        int oldX = maxIndex % 10;
+        int oldY = (maxIndex % 100) / 10;
+        int newX = (maxIndex % 1000) / 100;
+        int newY = (maxIndex % 10000) / 1000;
+        int arrowX = (maxIndex % 100000) / 10000;
+        int arrowY = (maxIndex % 1000000) / 100000;
+        return new Action(oldX, oldY, newX, newY, arrowX, arrowY);
     }
 
     public Node getRoot() {
