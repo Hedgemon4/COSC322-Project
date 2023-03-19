@@ -37,9 +37,12 @@ public class MonteCarloTree {
             At the start of the game, we use a move dictionary to find out move, and then we use the saved time to start
             searching our tree.
          */
+
+        Action selectedAction = null;
+
         boolean useMoveDictionary = root.getDepth() < 8;
         if (useMoveDictionary) {
-            return getMoveDictionaryMove();
+            selectedAction = getMoveDictionaryMove();
         }
         try {
             while (time.timeLeft()) {
@@ -77,10 +80,10 @@ public class MonteCarloTree {
 
         System.out.println("Ran " + getRoot().getTotalPlayouts() + " times");
 
-        if (mostVisitedNode() == null)
-            return null;
-        else
-            return mostVisitedNode().getAction();
+        if (mostVisitedNode() != null && !useMoveDictionary)
+            selectedAction = mostVisitedNode().getAction();
+
+        return selectedAction;
     }
 
     private Node select(Node tree) {

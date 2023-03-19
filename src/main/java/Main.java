@@ -23,6 +23,7 @@ public class Main extends GamePlayer {
     private final String passwd;
 
     private State state;
+    private Action action;
     private int colour;
 
     private MonteCarloTree monteCarloTree;
@@ -108,14 +109,15 @@ public class Main extends GamePlayer {
             case GameMessage.GAME_ACTION_MOVE:
                 getGameGUI().updateGameState(msgDetails);
                 depth++;
-                Action a = new Action(msgDetails);
-                System.out.println("Opponent action: " + a);
-                if (!ActionChecker.validMove(state, a)) {
+                Action opponentAction = new Action(msgDetails);
+                action = opponentAction;
+                System.out.println("Opponent action: " + opponentAction);
+                if (!ActionChecker.validMove(state, opponentAction)) {
                     for (int i = 0; i < 10; i++) {
                         System.out.println("INVALID MOVE!");
                     }
                 }
-                state = new State(state, new Action(msgDetails));
+                state = new State(state, opponentAction);
                 makeMove();
                 if (ActionGenerator.generateActions(state, colour == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN, depth).size() == 0) {
                     System.out.println("We won Mr. Stark");
@@ -135,7 +137,8 @@ public class Main extends GamePlayer {
 
     private void makeMonteCarloMove() {
         long start = System.currentTimeMillis();
-        monteCarloTree = new MonteCarloTree(state, cValue, colour, depth, moveDictionary);
+        if (action != null)
+            monteCarloTree.updateRoot(state, action, colour, depth);
         Action definitelyTheBestAction = monteCarloTree.search();
         if (definitelyTheBestAction == null) {
             System.out.println("OPPONENT WINS!!");
