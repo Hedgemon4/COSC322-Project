@@ -2,10 +2,7 @@ package State;
 
 import ygraph.ai.smartfox.games.amazons.AmazonsGameMessage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Action {
     private int oldX;
@@ -17,6 +14,7 @@ public class Action {
 
     /**
      * Converts a map to an action. Each action in the input is 1 indexed and is converted to a 0 indexed action internally
+     *
      * @param actionMap The map returned by the server
      */
     @SuppressWarnings("unchecked")
@@ -36,10 +34,11 @@ public class Action {
 
     /**
      * Internal constructor for the action class
-     * @param oldX The old x position of the queen
-     * @param oldY The old y position of the queen
-     * @param newX The new x position of the queen
-     * @param newY The new y position of the queen
+     *
+     * @param oldX   The old x position of the queen
+     * @param oldY   The old y position of the queen
+     * @param newX   The new x position of the queen
+     * @param newY   The new y position of the queen
      * @param arrowX The x position of the arrow
      * @param arrowY The y position of the arrow
      */
@@ -102,6 +101,7 @@ public class Action {
 
     /**
      * Represents the action in the conventional notation of [old queen pos]-[new queen pos]/[arrow pos]
+     *
      * @return The action in the conventional notation
      */
     @Override
@@ -112,6 +112,7 @@ public class Action {
 
     /**
      * Converts the action to a map that can be sent to the server
+     *
      * @return A map that can be sent to the server
      */
     public Map<String, Object> toServerResponse() {
@@ -120,5 +121,12 @@ public class Action {
         map.put(AmazonsGameMessage.QUEEN_POS_NEXT, new ArrayList<>(Arrays.asList(newY + 1, newX + 1)));
         map.put(AmazonsGameMessage.ARROW_POS, new ArrayList<>(Arrays.asList(arrowY + 1, arrowX + 1)));
         return map;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Action action = (Action) o;
+        return oldX == action.oldX && oldY == action.oldY && newX == action.newX && newY == action.newY && arrowX == action.arrowX && arrowY == action.arrowY;
     }
 }

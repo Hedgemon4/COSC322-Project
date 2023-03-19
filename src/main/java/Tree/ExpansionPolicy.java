@@ -109,7 +109,7 @@ public class ExpansionPolicy {
         return nodesToReturn.toArray(new Node[0]);
     }
 
-    private static int calculateLiberty(int x, int y, BitBoard board) {
+    public static int calculateLiberty(int x, int y, BitBoard board) {
         // Combine all boards together such that it now represents if there is ANY piece on the board at a given index
         long spaceTop = 0L;
         long spaceBottom = 0L;

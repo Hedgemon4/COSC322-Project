@@ -1,6 +1,5 @@
 import State.State;
 import Tree.MonteCarloTree;
-import Tree.Node;
 import ygraph.ai.smartfox.games.BaseGameGUI;
 import ygraph.ai.smartfox.games.GameClient;
 import ygraph.ai.smartfox.games.GameMessage;
@@ -9,8 +8,6 @@ import ygraph.ai.smartfox.games.amazons.AmazonsGameMessage;
 import ygraph.ai.smartfox.games.amazons.HumanPlayer;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Map;
@@ -140,7 +137,7 @@ public class Main extends GamePlayer {
         long start = System.currentTimeMillis();
         monteCarloTree = new MonteCarloTree(state, cValue, colour, depth, moveDictionary);
         Action definitelyTheBestAction = monteCarloTree.search();
-        if(definitelyTheBestAction==null){
+        if (definitelyTheBestAction == null) {
             System.out.println("OPPONENT WINS!!");
             System.exit(0);
         }

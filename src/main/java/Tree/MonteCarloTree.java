@@ -3,8 +3,12 @@ package Tree;
 import State.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.concurrent.*;
+
+import static Tree.ExpansionPolicy.calculateLiberty;
 
 public class MonteCarloTree {
     private final double cValue;
@@ -29,11 +33,9 @@ public class MonteCarloTree {
     public Action search() {
         Node tree = root;
         Timer time = new Timer(29.5);
-        boolean useMoveDictionary = root.getDepth() < 6;
-        Action selected;
+        boolean useMoveDictionary = root.getDepth() < 8;
         if (useMoveDictionary) {
-            selected = moveDictionaryMove();
-            return selected;
+            return getMoveDictionaryMove();
         }
         try {
             while (time.timeLeft()) {
@@ -66,11 +68,12 @@ public class MonteCarloTree {
                     throw new RuntimeException(e);
                 }
             }
-        } catch(NullPointerException ignore) {}
+        } catch (NullPointerException ignore) {
+        }
 
         System.out.println("Ran " + getRoot().getTotalPlayouts() + " times");
 
-        if(mostVisitedNode()==null)
+        if (mostVisitedNode() == null)
             return null;
         else
             return mostVisitedNode().getAction();
@@ -82,10 +85,6 @@ public class MonteCarloTree {
             current = UCBMove(current);
 
         return current;
-    }
-
-    private Node expand(Node leaf) {
-        return ExpansionPolicy.expansionNode(leaf);
     }
 
     /**
@@ -148,13 +147,38 @@ public class MonteCarloTree {
         return (double) n.getTotalWins() / n.getTotalPlayouts() + cValue * Math.sqrt(Math.log((double) n.getParent().getTotalPlayouts() / n.getTotalPlayouts()));
     }
 
-    private Action moveDictionaryMove() {
+    private Action getMoveDictionaryMove() {
+        PriorityQueue<int[]> possibleActions;
+        Action selected;
         int[][] queens = this.root.getState().getQueens(this.root.getColour());
-        int max = 0;
-        int maxIndex = 0;
-        for (int s = 0; s < 4; s++) {
-            int x = queens[s][0];
-            int y = queens[s][1];
+        if (root.getDepth() < 4)
+            possibleActions = getDictionaryMoves(queens);
+        else {
+            int min = 50;
+            int x = queens[0][0];
+            int y = queens[0][1];
+            for (int[] item : queens) {
+                int liberty = calculateLiberty(item[0], item[1], root.getState().getBitBoard());
+                if (liberty < min) {
+                    min = liberty;
+                    x = item[0];
+                    y = item[1];
+                }
+            }
+            possibleActions = getDictionaryMoves(new int[][]{{x, y}});
+        }
+        do {
+            int[] k = possibleActions.poll();
+            selected = new Action(k[1], k[2], k[3], k[4], k[5], k[6]);
+        } while (!Arrays.asList(root.getPossibleActions()).contains(selected));
+        return selected;
+    }
+
+    private PriorityQueue<int[]> getDictionaryMoves(int[][] queens) {
+        PriorityQueue<int[]> topActions = new PriorityQueue<>((o1, o2) -> (o2[0]) - (o1[0]));
+        for (int[] queen : queens) {
+            int x = queen[0];
+            int y = queen[1];
             for (int i = 0; i < 100; i++) {
                 for (int j = 0; j < 100; j++) {
                     StringBuilder sb = new StringBuilder();
@@ -163,20 +187,17 @@ public class MonteCarloTree {
                     sb.append(y == 0 ? "0" + x : x + y * 10);
                     int index = Integer.parseInt(sb.toString());
                     int num = moveDictionary[index];
-                    if (num > max) {
-                        maxIndex = index;
-                        max = num;
-                    }
+                    int oldX = index % 10;
+                    int oldY = (index % 100) / 10;
+                    int newX = (index % 1000) / 100;
+                    int newY = (index % 10000) / 1000;
+                    int arrowX = (index % 100000) / 10000;
+                    int arrowY = (index % 1000000) / 100000;
+                    topActions.offer(new int[]{num, oldX, oldY, newX, newY, arrowX, arrowY});
                 }
             }
         }
-        int oldX = maxIndex % 10;
-        int oldY = (maxIndex % 100) / 10;
-        int newX = (maxIndex % 1000) / 100;
-        int newY = (maxIndex % 10000) / 1000;
-        int arrowX = (maxIndex % 100000) / 10000;
-        int arrowY = (maxIndex % 1000000) / 100000;
-        return new Action(oldX, oldY, newX, newY, arrowX, arrowY);
+        return topActions;
     }
 
     public Node getRoot() {
