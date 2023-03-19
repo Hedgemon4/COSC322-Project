@@ -11,7 +11,9 @@ public class ActionChecker {
      * @return if the action is valid
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+
     public static boolean validMove(State state, Action action) {
+
         // If any of the positions are out of bounds
         if (!inBounds(action.getOldX(), action.getOldY()) || !inBounds(action.getNewX(), action.getNewY()) || !inBounds(action.getArrowX(), action.getArrowY()))
             return false;
@@ -52,16 +54,23 @@ public class ActionChecker {
         if (xDirection != 0) xDirection /= Math.abs(xDirection);
         if (yDirection != 0) yDirection /= Math.abs(yDirection);
 
+        checkX = action.getNewX() + xDirection;
+        checkY = action.getNewY() + yDirection;
+
         // If there was a piece between the new pos and the arrow that isn't just the old piece
-        while (checkX != action.getNewX() && checkY != action.getNewY()) {
+        while (!((xDirection != 0 && checkX == action.getArrowX()) || (yDirection != 0 && checkY == action.getArrowY()))) {
             if (state.getPos(checkX, checkY) != 0 && !(checkX == action.getOldX() && checkY == action.getOldY()))
                 return false;
             checkX += xDirection;
             checkY += yDirection;
         }
+        if (checkX != action.getArrowX() || checkY != action.getArrowY())
+            return false;
 
         return true;
     }
+
+
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean inBounds(int x, int y) {
