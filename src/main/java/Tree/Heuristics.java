@@ -33,8 +33,6 @@ public class Heuristics {
 
         double w = w(D1);
 
-        System.out.println("w = " + w);
-
         double[] f = f(w);
 
         return f[0] * t1 + f[1] * c1 + f[2] * c2 + f[3] * t2;
