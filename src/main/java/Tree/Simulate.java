@@ -24,13 +24,13 @@ public class Simulate {
         State state = new State(node.getState(), node.getAction());
         int color = node.getColour();
         int depth = node.getDepth();
-        ArrayList<Action> actions = ActionGenerator.generateActions(state, color, depth);
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, color);
         Action selectedAction;
         while (actions.size() != 0) {
             selectedAction = actions.get((int) (Math.random() * actions.size()));
             state = new State(state, selectedAction);
             color = color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
-            actions = ActionGenerator.generateActions(state, color, ++depth);
+            actions = ActionGenerator.generateActions(state, color);
         }
         return color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
     }
@@ -41,13 +41,13 @@ public class Simulate {
         State state = new State(node.getState(), node.getAction());
         int color = node.getColour();
         int depth = node.getDepth();
-        ArrayList<Action> actions = ActionGenerator.generateActions(state, color, depth);
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, color);
         Action selectedAction;
         while (actions.size() != 0 && i < TERMINATION_DEPTH) {
             selectedAction = actions.get((int) (Math.random() * actions.size()));
             state = new State(state, selectedAction);
             color = (color == State.BLACK_QUEEN) ? State.WHITE_QUEEN : State.BLACK_QUEEN;
-            actions = ActionGenerator.generateActions(state, color, ++depth);
+            actions = ActionGenerator.generateActions(state, color);
             i++;
         }
         if (i < TERMINATION_DEPTH)

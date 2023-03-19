@@ -22,7 +22,7 @@ public class ExpansionPolicy {
         Action randomAction = node.getPossibleActions()[randomInt];
         State state = new State(node.getState(), randomAction);
         int colour = node.getColour() == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
-        Action[] actions = ActionGenerator.generateActions(state, colour, node.getDepth()).toArray(new Action[0]);
+        Action[] actions = ActionGenerator.generateActions(state, colour).toArray(new Action[0]);
         Node expansion = new Node(state, randomAction, node, colour, 0, 0, actions, node.getDepth() + 1);
         node.getChildren()[randomInt] = expansion;
         return expansion;
@@ -100,7 +100,7 @@ public class ExpansionPolicy {
             State state = (State) actionInfo[2];
 
             int colour = node.getColour() == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
-            Action[] actions = ActionGenerator.generateActions(state, colour, node.getDepth()).toArray(new Action[0]);
+            Action[] actions = ActionGenerator.generateActions(state, colour).toArray(new Action[0]);
             Node expansion = new Node(state, node.getPossibleActions()[pickedActionIndex], node, colour, 0, 0, actions, node.getDepth() + 1);
             node.getChildren()[pickedActionIndex] = expansion;
             nodesToReturn.add(expansion);
@@ -109,7 +109,7 @@ public class ExpansionPolicy {
         return nodesToReturn.toArray(new Node[0]);
     }
 
-    private static int calculateLiberty(int x, int y, BitBoard board) {
+    public static int calculateLiberty(int x, int y, BitBoard board) {
         // Combine all boards together such that it now represents if there is ANY piece on the board at a given index
         long spaceTop = 0L;
         long spaceBottom = 0L;

@@ -1,6 +1,5 @@
 import State.State;
 import Tree.MonteCarloTree;
-import Tree.Node;
 import ygraph.ai.smartfox.games.BaseGameGUI;
 import ygraph.ai.smartfox.games.GameClient;
 import ygraph.ai.smartfox.games.GameMessage;
@@ -8,6 +7,8 @@ import ygraph.ai.smartfox.games.GamePlayer;
 import ygraph.ai.smartfox.games.amazons.AmazonsGameMessage;
 import ygraph.ai.smartfox.games.amazons.HumanPlayer;
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -22,12 +23,13 @@ public class Main extends GamePlayer {
     private final String passwd;
 
     private State state;
+    private Action action;
     private int colour;
 
     private MonteCarloTree monteCarloTree;
     private final double cValue = 2.0;
     private int depth = 0;
-
+    private static int[] moveDictionary;
 
     /**
      * A test main method
@@ -46,6 +48,14 @@ public class Main extends GamePlayer {
         } else {
             BaseGameGUI.sys_setup();
             java.awt.EventQueue.invokeLater(player::Go);
+        }
+
+        // Load Move Dictionary
+        try {
+            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("bin/training/moveDictionary.ser"));
+            moveDictionary = (int[]) objectInputStream.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -87,7 +97,7 @@ public class Main extends GamePlayer {
                 // If we are black, we move first
                 boolean isBlack = msgDetails.get(AmazonsGameMessage.PLAYER_BLACK).equals(getGameClient().getUserName());
                 colour = isBlack ? State.BLACK_QUEEN : State.WHITE_QUEEN;
-                monteCarloTree = new MonteCarloTree(state, cValue, colour, depth);
+                monteCarloTree = new MonteCarloTree(state, cValue, colour, depth, moveDictionary);
                 if (isBlack)
                     makeMove();
                 break;
@@ -99,16 +109,17 @@ public class Main extends GamePlayer {
             case GameMessage.GAME_ACTION_MOVE:
                 getGameGUI().updateGameState(msgDetails);
                 depth++;
-                Action a = new Action(msgDetails);
-                System.out.println("Opponent action: " + a);
-                if (!ActionChecker.validMove(state, a)) {
+                Action opponentAction = new Action(msgDetails);
+                action = opponentAction;
+                System.out.println("Opponent action: " + opponentAction);
+                if (!ActionChecker.validMove(state, opponentAction)) {
                     for (int i = 0; i < 10; i++) {
                         System.out.println("INVALID MOVE!");
                     }
                 }
-                state = new State(state, new Action(msgDetails));
+                state = new State(state, opponentAction);
                 makeMove();
-                if (ActionGenerator.generateActions(state, colour == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN, depth).size() == 0) {
+                if (ActionGenerator.generateActions(state, colour == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN).size() == 0) {
                     System.out.println("We won Mr. Stark");
                 }
 
@@ -126,10 +137,10 @@ public class Main extends GamePlayer {
 
     private void makeMonteCarloMove() {
         long start = System.currentTimeMillis();
-        monteCarloTree = new MonteCarloTree(state, cValue, colour, depth);
-
+        if (action != null)
+            monteCarloTree.updateRoot(state, action, colour, depth);
         Action definitelyTheBestAction = monteCarloTree.search();
-        if(definitelyTheBestAction==null){
+        if (definitelyTheBestAction == null) {
             System.out.println("OPPONENT WINS!!");
             System.exit(0);
         }
@@ -146,7 +157,7 @@ public class Main extends GamePlayer {
 
     private void makeRandomMove() {
         long start = System.nanoTime();
-        ArrayList<Action> actions = ActionGenerator.generateActions(state, colour, depth);
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, colour);
         Action selectedAction = actions.get((int) (Math.random() * actions.size()));
         state = new State(state, selectedAction);
         getGameClient().sendMoveMessage(selectedAction.toServerResponse());
