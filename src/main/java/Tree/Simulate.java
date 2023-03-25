@@ -64,6 +64,10 @@ public class Simulate {
         }
     }
 
+    private static int moveDictionarySimulate(Node node) {
+
+    }
+
     private static int boardControlHeuristic(State state, int colour) {
         int[][] queens = state.getQueens(colour);
         byte[][] board = new byte[State.BOARD_SIZE][State.BOARD_SIZE];
