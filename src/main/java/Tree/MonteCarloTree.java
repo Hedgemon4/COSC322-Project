@@ -42,7 +42,7 @@ public class MonteCarloTree {
 
         boolean useMoveDictionary = root.getDepth() < 8;
         if (useMoveDictionary) {
-            selectedAction = getMoveDictionaryMove();
+            return getMoveDictionaryMove();
         }
         try {
             while (time.timeLeft()) {

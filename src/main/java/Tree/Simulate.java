@@ -3,6 +3,7 @@ package Tree;
 import State.*;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Simulate {
 
@@ -38,16 +39,16 @@ public class Simulate {
     private static int earlyTerminationPlayout(Node node) {
         int i = 0;
         final int TERMINATION_DEPTH = 35;
-        State state = new State(node.getState(), node.getAction());
+        State state = node.getState();
         int color = node.getColour();
-        int depth = node.getDepth();
-        ArrayList<Action> actions = ActionGenerator.generateActions(state, color);
+        Action[] actions = node.getPossibleActions();
         Action selectedAction;
-        while (actions.size() != 0 && i < TERMINATION_DEPTH) {
-            selectedAction = actions.get((int) (Math.random() * actions.size()));
+        Random random = new Random();
+        while (actions.length != 0 && i < TERMINATION_DEPTH) {
+            selectedAction = actions[random.nextInt(actions.length)];
             state = new State(state, selectedAction);
             color = (color == State.BLACK_QUEEN) ? State.WHITE_QUEEN : State.BLACK_QUEEN;
-            actions = ActionGenerator.generateActions(state, color);
+            actions = ActionGenerator.generateActions(state, color).toArray(new Action[0]);
             i++;
         }
         if (i < TERMINATION_DEPTH)

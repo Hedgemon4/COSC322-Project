@@ -31,7 +31,7 @@ public class HeuristicTesting {
         int numStates = 10000;
         for (int i = 0; i < numStates; i++) {
             State randomState = states.get(r.nextInt(states.size()));
-            ArrayList<Action> actions = ActionGenerator.generateActions(randomState, r.nextInt(1) + 1, 1);
+            ArrayList<Action> actions = ActionGenerator.generateActions(randomState, r.nextInt(1) + 1);
             states.add(new State(s, actions.get(r.nextInt(actions.size()))));
         }
 

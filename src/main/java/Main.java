@@ -137,8 +137,7 @@ public class Main extends GamePlayer {
 
     private void makeMonteCarloMove() {
         long start = System.currentTimeMillis();
-        if (action != null)
-            monteCarloTree.updateRoot(state, action, colour, depth);
+        monteCarloTree = new MonteCarloTree(state, cValue, colour, depth, moveDictionary);
         Action definitelyTheBestAction = monteCarloTree.search();
         if (definitelyTheBestAction == null) {
             System.out.println("OPPONENT WINS!!");
