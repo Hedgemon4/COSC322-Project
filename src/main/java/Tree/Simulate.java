@@ -13,7 +13,7 @@ public class Simulate {
      * @return The player that won. Either State.BLACK or State.WHITE
      */
     public static int simulate(Node node) {
-        return earlyTerminationPlayout(node);
+        return otherSimulate(node);
     }
 
     /**
@@ -40,7 +40,6 @@ public class Simulate {
         final int TERMINATION_DEPTH = 35;
         State state = new State(node.getState(), node.getAction());
         int color = node.getColour();
-        int depth = node.getDepth();
         ArrayList<Action> actions = ActionGenerator.generateActions(state, color);
         Action selectedAction;
         while (actions.size() != 0 && i < TERMINATION_DEPTH) {
@@ -61,6 +60,32 @@ public class Simulate {
                 return State.BLACK_QUEEN;
             else
                 return State.WHITE_QUEEN;
+        }
+    }
+
+    private static int otherSimulate(Node node) {
+        int i = 0;
+        final int TERMINATION_DEPTH = 10;
+        State state = new State(node.getState(), node.getAction());
+        int color = node.getColour();
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, color);
+        Action selectedAction;
+        while (actions.size() != 0 && i < TERMINATION_DEPTH) {
+            selectedAction = actions.get((int) (Math.random() * actions.size()));
+            state = new State(state, selectedAction);
+            color = (color == State.BLACK_QUEEN) ? State.WHITE_QUEEN : State.BLACK_QUEEN;
+            actions = ActionGenerator.generateActions(state, color);
+            i++;
+        }
+        if (i < TERMINATION_DEPTH)
+            return color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
+        else {
+            double d = Heuristics.bigPoppa(state, color);
+            if (d == 0)
+                return 0;
+            else if (d > 0)
+                return State.BLACK_QUEEN;
+            return State.WHITE_QUEEN;
         }
     }
 
