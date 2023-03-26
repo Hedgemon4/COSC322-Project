@@ -12,6 +12,37 @@ public class ExpansionPolicy {
 
     public static Node[] expansionNode(Node node, int numToExpand) {
         return bitBoardLibertyExpansionPolicy(node, numToExpand);
+//        return heuristicExpansion(node, numToExpand);
+    }
+
+    private static Node[] heuristicExpansion(Node node, int numToExpand) {
+        int colour = node.getColour();
+        Action[] actions = node.getPossibleActions();
+        Node[] children = node.getChildren();
+        int definitelyTheBestAction = 0;
+        double bestH = Math.pow(-1, colour) * Integer.MAX_VALUE;
+        for (int i = 0; i < actions.length; i++) {
+            if (children[i] == null) {
+                Action a = actions[i];
+                double h = Heuristics.bigPoppa(new State(node.getState(), a), colour);
+                if (colour == 1 && h > bestH) {
+                    definitelyTheBestAction = i;
+                    bestH = h;
+                } else if (colour == 2 && h < bestH) {
+                    definitelyTheBestAction = i;
+                    bestH = h;
+                }
+            }
+        }
+
+        State state = node.getState();
+        colour = node.getColour() == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
+        State newState = new State(state, actions[definitelyTheBestAction]);
+        Action[] newActions = ActionGenerator.generateActions(newState, colour).toArray(new Action[0]);
+        Node expansion = new Node(newState, actions[definitelyTheBestAction], node, colour, 0, 0, newActions, node.getDepth() + 1);
+        node.getChildren()[definitelyTheBestAction] = expansion;
+
+        return new Node[]{expansion};
     }
 
     private static Node randomExpansion(Node node) {

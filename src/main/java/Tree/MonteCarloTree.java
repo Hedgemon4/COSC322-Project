@@ -1,6 +1,7 @@
 package Tree;
 
-import State.*;
+import State.Action;
+import State.State;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,24 +52,25 @@ public class MonteCarloTree {
                 // Get most promising nodes to simulate
                 Node[] children = ExpansionPolicy.expansionNode(leaf, NUM_TO_EXPAND);
 
-                // Simulate each child in its own Thread
                 // There should never be zero nodes returned because select() should not have chosen it
                 if (children.length == 0)
-                    throw new RuntimeException("HELP, THIS IS BAD");
+                    throw new RuntimeException("HELP, THIS IS BAD " + root.getTotalPlayouts());
+
+                // Simulate each child in its own Thread
 
                 // Create a list of runnable tasks that will be executed in separate threads
-                List<Callable<Integer>> callables = new ArrayList<>();
+                List<Callable<Double>> callables = new ArrayList<>();
                 for (Node child : children)
                     callables.add(() -> Simulate.simulate(child));
 
                 try {
                     // Execute all tasks. Will block until all threads have returned a value
-                    List<Future<Integer>> futures = executor.invokeAll(callables);
+                    List<Future<Double>> futures = executor.invokeAll(callables);
 
                     // Backpropagation of results
                     for (int i = 0; i < children.length; i++) {
-                        Future<Integer> future = futures.get(i);
-                        int result = future.get();
+                        Future<Double> future = futures.get(i);
+                        double result = future.get();
                         backPropagate(result, children[i]);
                     }
                 } catch (InterruptedException | ExecutionException e) {
@@ -100,21 +102,42 @@ public class MonteCarloTree {
      * @param result The player that won. Either State.BLACK or State.WHITE
      * @param child  The child node that was just simulated
      */
-    private void backPropagate(int result, Node child) {
-        if (child.getColour() != result) {
+//    private void backPropagate(int result, Node child) {
+//        if (child.getColour() != result) {
+//            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+//            child.setTotalWins(child.getTotalWins() + 1);
+//        } else {
+//            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+//        }
+//
+//        while (child.getParent() != null) {
+//            child = child.getParent();
+//            if (child.getColour() != result) {
+//                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+//                child.setTotalWins(child.getTotalWins() + 1);
+//            } else {
+//                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+//            }
+//        }
+//    }
+
+    private void backPropagate(double result, Node child) {
+        if (child.getColour() != State.BLACK_QUEEN) {
             child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-            child.setTotalWins(child.getTotalWins() + 1);
+            child.setTotalWins(child.getTotalWins() + result);
         } else {
             child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+            child.setTotalWins(child.getTotalWins() - result);
         }
 
         while (child.getParent() != null) {
             child = child.getParent();
-            if (child.getColour() != result) {
+            if (child.getColour() != State.BLACK_QUEEN) {
                 child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-                child.setTotalWins(child.getTotalWins() + 1);
+                child.setTotalWins(child.getTotalWins() + result);
             } else {
                 child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+                child.setTotalWins(child.getTotalWins() - result);
             }
         }
     }

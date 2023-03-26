@@ -12,8 +12,50 @@ public class Simulate {
      * @param node The Node to be played out
      * @return The player that won. Either State.BLACK or State.WHITE
      */
-    public static int simulate(Node node) {
-        return earlyTerminationPlayout(node);
+    public static double simulate(Node node) {
+//        return earlyTerminationPlayout(node);
+        return heuristicSimulation(node);
+    }
+
+    private static double heuristicSimulation(Node node) {
+        State state = node.getState();
+
+        double heuristic = Heuristics.bigPoppa(state, node.getColour());
+        return heuristic;
+//        if (heuristic > 0)
+//            return State.BLACK_QUEEN;
+//        else
+//            return State.WHITE_QUEEN;
+    }
+
+
+    /**
+     * Hot garbage. Waaaaaaaaaay too slow
+     */
+    private static int heuristicSimulation2(Node node) {
+        State state = node.getState();
+        int color = node.getColour();
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, color);
+        while (actions.size() > 0) {
+            Action definitelyTheBestAction = null;
+            double bestH = Math.pow(-1, color) * Integer.MAX_VALUE;
+            for (Action a : actions) {
+                double h = Heuristics.bigPoppa(new State(state, a), color);
+                if (color == 1 && h > bestH) {
+                    definitelyTheBestAction = a;
+                    bestH = h;
+                } else if (color == 2 && h < bestH) {
+                    definitelyTheBestAction = a;
+                    bestH = h;
+                }
+            }
+            assert definitelyTheBestAction != null;
+            state = new State(state, definitelyTheBestAction);
+            color = color == 1 ? 2 : 1;
+            actions = ActionGenerator.generateActions(state, color);
+        }
+
+        return color == 1 ? 2 : 1;
     }
 
     /**
@@ -61,6 +103,11 @@ public class Simulate {
                 return State.BLACK_QUEEN;
             else
                 return State.WHITE_QUEEN;
+//            double heuristic = Heuristics.bigPoppa(state, node.getColour());
+//            if (heuristic > 0)
+//                return State.BLACK_QUEEN;
+//            else
+//                return State.WHITE_QUEEN;
         }
     }
 

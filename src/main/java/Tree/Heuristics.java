@@ -4,6 +4,7 @@ import State.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 enum Direction {
     DR,
@@ -21,21 +22,53 @@ enum Direction {
  * Heuristics from <a href="https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwimybbW8OX9AhVYEjQIHbt2DDkQFnoECA0QAQ&url=https%3A%2F%2Fcore.ac.uk%2Fdownload%2Fpdf%2F81108035.pdf&usg=AOvVaw1-nBRvide0AaBBcjDESUE4">this paper</a>
  */
 public class Heuristics {
+    private static final HashMap<Long, Double> previouslyEvaluated = new HashMap<>();
+
     public static double bigPoppa(State s, int playerToMove) {
+        long start = System.nanoTime();
+        // Check to see if we have previously evaluated this state
+        long hash = ZobristHash.zobristHash(s.getBitBoard(), playerToMove);
+        Double heuristic = previouslyEvaluated.get(hash);
+        if (heuristic != null)
+            return heuristic;
+        long end = System.nanoTime();
+        System.out.println("Hashing took " + (end - start) + "ns");
+
+        start = System.nanoTime();
+        // Else evaluate it
         int[][] D1 = D(1, s);
         int[][] D2 = D(2, s);
+        end = System.nanoTime();
+        System.out.println("D took " + (end - start) + "ns");
 
+        start = System.nanoTime();
         double t1 = t(D1, playerToMove);
         double t2 = t(D2, playerToMove);
+        end = System.nanoTime();
+        System.out.println("t took " + (end - start) + "ns");
 
+        start = System.nanoTime();
         double c1 = c(1, D1);
         double c2 = c(2, D2);
+        end = System.nanoTime();
+        System.out.println("c took " + (end - start) + "ns");
 
+        start = System.nanoTime();
         double w = w(D1);
+        end = System.nanoTime();
+        System.out.println("w took " + (end - start) + "ns");
 
         double[] f = f(w);
 
-        return f[0] * t1 + f[1] * c1 + f[2] * c2 + f[3] * t2;
+        heuristic = f[0] * t1 + f[1] * c1 + f[2] * c2 + f[3] * t2;
+
+        start = System.nanoTime();
+        previouslyEvaluated.put(hash, heuristic);
+        end = System.nanoTime();
+        System.out.println("put took " + (end - start) + "ns");
+
+        // 87 is the estimated maximum value of the heuristic, so this just normalizes the output to be in the range of -1 to 1
+        return heuristic;
     }
 
     private static double[] f(double w) {
@@ -366,6 +399,522 @@ public class Heuristics {
         }
 
         return values;
+    }
+
+    public static BitBoard reachableInOneMove(BitBoard b) {
+        // Constants
+        long columnMask = 0b00000000010000000001000000000100000000010000000001L;
+        long rowMask = 0b1111111111L;
+        long diagonalMask = 0b10000000000100000000001000000000010000000000100000000001L;
+        long antiDiagonalMask = 0b000000001000000001000000001000000001000000001L;
+        long boardMask = -1L >>> (64 - 50);
+
+        long whiteTop = b.getWhiteQueensTop();
+        long whiteBottom = b.getWhiteQueensBottom();
+        long blackTop = b.getBlackQueensTop();
+        long blackBottom = b.getBlackQueensBottom();
+        long arrowTop = b.getArrowTop();
+        long arrowBottom = b.getArrowBottom();
+
+        // All squares reachable in one move
+        long blackReachableTop = 0L;
+        long blackReachableBottom = 0L;
+        long whiteReachableTop = 0L;
+        long whiteReachableBottom = 0L;
+
+        // Find black queens
+        long[] blackQueensTop = new long[4];
+        long[] blackQueensBottom = new long[4];
+        if (blackBottom > 1) {
+            blackQueensBottom[0] = Long.lowestOneBit(blackBottom);
+            blackQueensTop[0] = 0L;
+            blackBottom ^= blackQueensBottom[0];
+        } else {
+            blackQueensBottom[0] = 0L;
+            blackQueensTop[0] = Long.lowestOneBit(blackTop);
+            blackTop ^= blackQueensTop[0];
+        }
+        if (blackBottom > 1) {
+            blackQueensBottom[1] = Long.lowestOneBit(blackBottom);
+            blackQueensTop[1] = 0L;
+            blackBottom ^= blackQueensBottom[1];
+        } else {
+            blackQueensBottom[1] = 0L;
+            blackQueensTop[1] = Long.lowestOneBit(blackTop);
+            blackTop ^= blackQueensTop[1];
+        }
+        if (blackBottom > 1) {
+            blackQueensBottom[2] = Long.lowestOneBit(blackBottom);
+            blackQueensTop[2] = 0L;
+            blackBottom ^= blackQueensBottom[2];
+        } else {
+            blackQueensBottom[2] = 0L;
+            blackQueensTop[2] = Long.lowestOneBit(blackTop);
+            blackTop ^= blackQueensTop[2];
+        }
+        if (blackBottom > 1) {
+            blackQueensBottom[3] = Long.lowestOneBit(blackBottom);
+            blackQueensTop[3] = 0L;
+            blackBottom ^= blackQueensBottom[3];
+        } else {
+            blackQueensBottom[3] = 0L;
+            blackQueensTop[3] = Long.lowestOneBit(blackTop);
+            blackTop ^= blackQueensTop[3];
+        }
+
+
+        // Find white queens
+        long[] whiteQueensTop = new long[4];
+        long[] whiteQueensBottom = new long[4];
+        if (whiteBottom > 1) {
+            whiteQueensBottom[0] = Long.lowestOneBit(whiteBottom);
+            whiteQueensTop[0] = 0L;
+            whiteBottom ^= whiteQueensBottom[0];
+        } else {
+            whiteQueensBottom[0] = 0L;
+            whiteQueensTop[0] = Long.lowestOneBit(whiteTop);
+            whiteTop ^= whiteQueensTop[0];
+        }
+        if (whiteBottom > 1) {
+            whiteQueensBottom[1] = Long.lowestOneBit(whiteBottom);
+            whiteQueensTop[1] = 0L;
+            whiteBottom ^= whiteQueensBottom[1];
+        } else {
+            whiteQueensBottom[1] = 0L;
+            whiteQueensTop[1] = Long.lowestOneBit(whiteTop);
+            whiteTop ^= whiteQueensTop[1];
+        }
+        if (whiteBottom > 1) {
+            whiteQueensBottom[2] = Long.lowestOneBit(whiteBottom);
+            whiteQueensTop[2] = 0L;
+            whiteBottom ^= whiteQueensBottom[2];
+        } else {
+            whiteQueensBottom[2] = 0L;
+            whiteQueensTop[2] = Long.lowestOneBit(whiteTop);
+            whiteTop ^= whiteQueensTop[2];
+        }
+        if (whiteBottom > 1) {
+            whiteQueensBottom[3] = Long.lowestOneBit(whiteBottom);
+            whiteQueensTop[3] = 0L;
+            whiteBottom ^= whiteQueensBottom[3];
+        } else {
+            whiteQueensBottom[3] = 0L;
+            whiteQueensTop[3] = Long.lowestOneBit(whiteTop);
+            whiteTop ^= whiteQueensTop[3];
+        }
+
+        for (int pieceNum = 0; pieceNum < 8; pieceNum++) {
+
+            // The piece we are moving
+            long startBottom, startTop;
+            if (pieceNum < 4) {
+                startBottom = blackQueensBottom[pieceNum];
+                startTop = blackQueensTop[pieceNum];
+            } else {
+                startBottom = whiteQueensBottom[pieceNum - 4];
+                startTop = whiteQueensTop[pieceNum - 4];
+            }
+
+            int startRow = getRow(startBottom, startTop);
+            int startCol = getCol(startBottom, startTop);
+
+            // All pieces except the one we are moving
+            long occupiedTop = blackTop | whiteTop | arrowTop;
+            long occupiedBottom = blackBottom | whiteBottom | arrowBottom;
+            occupiedTop ^= startTop;
+            occupiedBottom ^= startBottom;
+
+
+            ///////////////////////////////////////////
+            // Generate masks along the 4 directions //
+            ///////////////////////////////////////////
+
+            // Horizontal
+            long rowMaskTop, rowMaskBottom;
+            if (startRow < 5) {
+                rowMaskTop = 0L;
+                rowMaskBottom = rowMask << (startRow * 10);
+            } else {
+                rowMaskTop = rowMask << ((startRow - 5) * 10);
+                rowMaskBottom = 0L;
+            }
+
+            // Vertical
+            long colMaskTop = columnMask << startCol;
+            long colMaskBottom = columnMask << startCol;
+
+            // Diagonal
+            long diagMaskTop, diagMaskBottom;
+            int diagShift = startCol - startRow;
+            if (diagShift >= 0) {
+                if (diagShift >= 5) {
+                    diagMaskTop = 0L;
+                    diagMaskBottom = (diagonalMask << diagShift) & ~(-1L << ((10 - diagShift) * 10));
+                } else {
+                    diagMaskTop = (diagonalMask << (diagShift + 5)) & ~(-1L << ((5 - diagShift) * 10));
+                    diagMaskBottom = diagonalMask << diagShift;
+                }
+            } else {
+                if (diagShift < -5) {
+                    diagMaskTop = (diagonalMask >>> (-diagShift + 6)) & (-1L << ((-diagShift - 5) * 10));
+                    diagMaskBottom = 0L;
+                } else {
+                    diagMaskTop = diagonalMask >>> (-diagShift + 6);
+                    diagMaskBottom = (diagonalMask >>> (-diagShift)) & (-1L << (-diagShift * 10));
+                }
+            }
+
+            long antiDiagMaskTop, antiDiagMaskBottom;
+            int antiDiagShift = startCol + startRow;
+            if (antiDiagShift >= 9) {
+                if (antiDiagShift > 13) {
+                    antiDiagMaskTop = (antiDiagonalMask << (antiDiagShift - 5)) & (-1L << ((antiDiagShift - 14) * 10 + 1));
+                    antiDiagMaskBottom = 0L;
+                } else {
+                    antiDiagMaskTop = (antiDiagonalMask << (antiDiagShift - 5));
+                    antiDiagMaskBottom = (antiDiagonalMask << (antiDiagShift)) & (-1L << ((antiDiagShift - 9) * 10 + 1));
+                }
+            } else {
+                if (antiDiagShift < 4) {
+                    antiDiagMaskTop = 0L;
+                    antiDiagMaskBottom = (antiDiagonalMask << (antiDiagShift)) & ~(-1L << ((antiDiagShift + 1) * 10 - 1));
+                } else {
+                    antiDiagMaskTop = (antiDiagonalMask << (antiDiagShift - 5)) & ~(-1L << ((antiDiagShift - 4) * 10 - 1));
+                    antiDiagMaskBottom = (antiDiagonalMask << (antiDiagShift));
+                }
+            }
+
+            // Make sure that all masks are only on the board
+            rowMaskTop &= boardMask;
+            rowMaskBottom &= boardMask;
+            colMaskTop &= boardMask;
+            colMaskBottom &= boardMask;
+            diagMaskTop &= boardMask;
+            diagMaskBottom &= boardMask;
+            antiDiagMaskTop &= boardMask;
+            antiDiagMaskBottom &= boardMask;
+
+
+            ////////////////////////
+            //     Get pieces     //
+            ////////////////////////
+
+            // Get the possible pieces below the current piece
+            long piecesBelowBottom, piecesBelowTop;
+            piecesBelowBottom = startBottom - 1;
+            if (startTop == 0)
+                piecesBelowTop = 0L;
+            else
+                piecesBelowTop = startTop - 1;
+
+            // Get the possible pieces above the current piece
+            long piecesAboveBottom = ~startBottom ^ piecesBelowBottom;
+            long piecesAboveTop = ~startTop ^ piecesBelowTop;
+
+
+            // Get the pieces that are along the path of the current piece in each direction
+            long occupiedRowTop = occupiedTop & rowMaskTop;
+            long occupiedRowBottom = occupiedBottom & rowMaskBottom;
+            long occupiedColTop = occupiedTop & colMaskTop;
+            long occupiedColBottom = occupiedBottom & colMaskBottom;
+            long occupiedDiagTop = occupiedTop & diagMaskTop;
+            long occupiedDiagBottom = occupiedBottom & diagMaskBottom;
+            long occupiedAntiDiagTop = occupiedTop & antiDiagMaskTop;
+            long occupiedAntiDiagBottom = occupiedBottom & antiDiagMaskBottom;
+
+
+            ////////////////////////
+            // Get blocking piece //
+            ////////////////////////
+
+            // Get the first blocking piece in col above the current piece
+            long blockingPieceColAboveBottom, blockingPieceColAboveTop;
+            if (startTop != 0) {
+                blockingPieceColAboveBottom = 0L;
+                blockingPieceColAboveTop = Long.lowestOneBit(occupiedColTop & piecesAboveTop);
+            } else {
+                blockingPieceColAboveBottom = Long.lowestOneBit(occupiedColBottom & piecesAboveBottom);
+                if (blockingPieceColAboveBottom == 0)
+                    blockingPieceColAboveTop = Long.lowestOneBit(occupiedColTop & piecesAboveTop);
+                else
+                    blockingPieceColAboveTop = 0L;
+            }
+
+            // Get the first blocking piece in col below the current piece
+            long blockingPieceColBelowBottom, blockingPieceColBelowTop;
+            if (startTop == 0) {
+                blockingPieceColBelowTop = 0L;
+                blockingPieceColBelowBottom = Long.highestOneBit(occupiedColBottom & piecesBelowBottom);
+            } else {
+                blockingPieceColBelowTop = Long.highestOneBit(occupiedColTop & piecesBelowTop);
+                if (blockingPieceColBelowTop == 0)
+                    blockingPieceColBelowBottom = Long.highestOneBit(occupiedColBottom & piecesBelowBottom);
+                else
+                    blockingPieceColBelowBottom = 0L;
+            }
+
+            // Get the first blocking piece in row above the current piece
+            long blockingPieceRowAboveBottom, blockingPieceRowAboveTop;
+            if (startTop != 0) {
+                blockingPieceRowAboveBottom = 0L;
+                blockingPieceRowAboveTop = Long.lowestOneBit(occupiedRowTop & piecesAboveTop);
+            } else {
+                blockingPieceRowAboveBottom = Long.lowestOneBit(occupiedRowBottom & piecesAboveBottom);
+                blockingPieceRowAboveTop = 0L;
+            }
+
+            // Get the first blocking piece in row below the current piece
+            long blockingPieceRowBelowBottom, blockingPieceRowBelowTop;
+            if (startTop == 0) {
+                blockingPieceRowBelowTop = 0L;
+                blockingPieceRowBelowBottom = Long.highestOneBit(occupiedRowBottom & piecesBelowBottom);
+            } else {
+                blockingPieceRowBelowTop = Long.highestOneBit(occupiedRowTop & piecesBelowTop);
+                blockingPieceRowBelowBottom = 0L;
+            }
+
+            // Get the first blocking piece in diag above the current piece
+            long blockingPieceDiagAboveBottom, blockingPieceDiagAboveTop;
+            if (startTop != 0) {
+                blockingPieceDiagAboveBottom = 0L;
+                blockingPieceDiagAboveTop = Long.lowestOneBit(occupiedDiagTop & piecesAboveTop);
+            } else {
+                blockingPieceDiagAboveBottom = Long.lowestOneBit(occupiedDiagBottom & piecesAboveBottom);
+                if (blockingPieceDiagAboveBottom == 0)
+                    blockingPieceDiagAboveTop = Long.lowestOneBit(occupiedDiagTop & piecesAboveTop);
+                else
+                    blockingPieceDiagAboveTop = 0L;
+            }
+
+            // Get the first blocking piece in diag below the current piece
+            long blockingPieceDiagBelowBottom, blockingPieceDiagBelowTop;
+            if (startTop == 0) {
+                blockingPieceDiagBelowTop = 0L;
+                blockingPieceDiagBelowBottom = Long.highestOneBit(occupiedDiagBottom & piecesBelowBottom);
+            } else {
+                blockingPieceDiagBelowTop = Long.highestOneBit(occupiedDiagTop & piecesBelowTop);
+                if (blockingPieceDiagBelowTop == 0)
+                    blockingPieceDiagBelowBottom = Long.highestOneBit(occupiedDiagBottom & piecesBelowBottom);
+                else
+                    blockingPieceDiagBelowBottom = 0L;
+            }
+
+            // Get the first blocking piece in anti-diag above the current piece
+            long blockingPieceAntiDiagAboveBottom, blockingPieceAntiDiagAboveTop;
+            if (startTop != 0) {
+                blockingPieceAntiDiagAboveBottom = 0L;
+                blockingPieceAntiDiagAboveTop = Long.lowestOneBit(occupiedAntiDiagTop & piecesAboveTop);
+            } else {
+                blockingPieceAntiDiagAboveBottom = Long.lowestOneBit(occupiedAntiDiagBottom & piecesAboveBottom);
+                if (blockingPieceAntiDiagAboveBottom == 0)
+                    blockingPieceAntiDiagAboveTop = Long.lowestOneBit(occupiedAntiDiagTop & piecesAboveTop);
+                else
+                    blockingPieceAntiDiagAboveTop = 0L;
+            }
+
+            // Get the first blocking piece in anti-diag below the current piece
+            long blockingPieceAntiDiagBelowBottom, blockingPieceAntiDiagBelowTop;
+            if (startTop == 0) {
+                blockingPieceAntiDiagBelowTop = 0L;
+                blockingPieceAntiDiagBelowBottom = Long.highestOneBit(occupiedAntiDiagBottom & piecesBelowBottom);
+            } else {
+                blockingPieceAntiDiagBelowTop = Long.highestOneBit(occupiedAntiDiagTop & piecesBelowTop);
+                if (blockingPieceAntiDiagBelowTop == 0)
+                    blockingPieceAntiDiagBelowBottom = Long.highestOneBit(occupiedAntiDiagBottom & piecesBelowBottom);
+                else
+                    blockingPieceAntiDiagBelowBottom = 0L;
+            }
+
+
+            ///////////////////////////
+            // Get pieces in between //
+            ///////////////////////////
+
+            // Get squares movable to in col above the current piece
+            long betweenColAboveBottom, betweenColAboveTop;
+            if (startTop != 0) {
+                betweenColAboveBottom = 0L;
+                if (blockingPieceColAboveTop == 0)
+                    betweenColAboveTop = piecesAboveTop & colMaskTop;
+                else
+                    betweenColAboveTop = piecesAboveTop & (blockingPieceColAboveTop - 1) & colMaskTop;
+            } else {
+                if (blockingPieceColAboveBottom == 0) {
+                    betweenColAboveBottom = piecesAboveBottom & colMaskBottom;
+                    betweenColAboveTop = (blockingPieceColAboveTop - 1) & colMaskTop;
+                } else {
+                    betweenColAboveBottom = piecesAboveBottom & (blockingPieceColAboveBottom - 1) & colMaskBottom;
+                    betweenColAboveTop = 0L;
+                }
+            }
+
+            // Get squares movable to in col below the current piece
+            long betweenColBelowBottom, betweenColBelowTop;
+            if (startTop == 0) {
+                betweenColBelowTop = 0L;
+                if (blockingPieceColBelowBottom == 0)
+                    betweenColBelowBottom = piecesBelowBottom & colMaskBottom;
+                else
+                    betweenColBelowBottom = piecesBelowBottom & (-blockingPieceColBelowBottom ^ blockingPieceColBelowBottom) & colMaskBottom;
+            } else {
+                if (blockingPieceColBelowTop == 0) {
+                    betweenColBelowTop = piecesBelowTop & colMaskTop;
+                    if (blockingPieceColBelowBottom == 0)
+                        betweenColBelowBottom = piecesBelowBottom & colMaskBottom;
+                    else
+                        betweenColBelowBottom = (-blockingPieceColBelowBottom ^ blockingPieceColBelowBottom) & colMaskBottom;
+                } else {
+                    betweenColBelowTop = piecesBelowTop & (-blockingPieceColBelowTop ^ blockingPieceColBelowTop) & colMaskTop;
+                    betweenColBelowBottom = 0L;
+                }
+            }
+
+            // Get squares movable to in row above the current piece
+            long betweenRowAboveBottom, betweenRowAboveTop;
+            if (startTop != 0) {
+                betweenRowAboveBottom = 0L;
+                if (blockingPieceRowAboveTop == 0)
+                    betweenRowAboveTop = piecesAboveTop & rowMaskTop;
+                else
+                    betweenRowAboveTop = piecesAboveTop & (blockingPieceRowAboveTop - 1) & rowMaskTop;
+            } else {
+                if (blockingPieceRowAboveBottom == 0) {
+                    betweenRowAboveBottom = piecesAboveBottom & rowMaskBottom;
+                } else {
+                    betweenRowAboveBottom = piecesAboveBottom & (blockingPieceRowAboveBottom - 1) & rowMaskBottom;
+                }
+                betweenRowAboveTop = 0L;
+            }
+
+            // Get squares movable to in row below the current piece
+            long betweenRowBelowBottom, betweenRowBelowTop;
+            if (startTop == 0) {
+                betweenRowBelowTop = 0L;
+                if (blockingPieceRowBelowBottom == 0)
+                    betweenRowBelowBottom = piecesBelowBottom & rowMaskBottom;
+                else
+                    betweenRowBelowBottom = piecesBelowBottom & (-blockingPieceRowBelowBottom ^ blockingPieceRowBelowBottom) & rowMaskBottom;
+            } else {
+                if (blockingPieceRowBelowTop == 0) {
+                    betweenRowBelowTop = piecesBelowTop & rowMaskTop;
+                } else {
+                    betweenRowBelowTop = piecesBelowTop & (-blockingPieceRowBelowTop ^ blockingPieceRowBelowTop) & rowMaskTop;
+                }
+                betweenRowBelowBottom = 0L;
+            }
+
+            // Get squares movable to in diag above the current piece
+            long betweenDiagAboveBottom, betweenDiagAboveTop;
+            if (startTop != 0) {
+                betweenDiagAboveBottom = 0L;
+                if (blockingPieceDiagAboveTop == 0)
+                    betweenDiagAboveTop = piecesAboveTop & diagMaskTop;
+                else
+                    betweenDiagAboveTop = piecesAboveTop & (blockingPieceDiagAboveTop - 1) & diagMaskTop;
+            } else {
+                if (blockingPieceDiagAboveBottom == 0) {
+                    betweenDiagAboveBottom = piecesAboveBottom & diagMaskBottom;
+                    betweenDiagAboveTop = (blockingPieceDiagAboveTop - 1) & diagMaskTop;
+                } else {
+                    betweenDiagAboveBottom = piecesAboveBottom & (blockingPieceDiagAboveBottom - 1) & diagMaskBottom;
+                    betweenDiagAboveTop = 0L;
+                }
+            }
+
+            // Get squares movable to in diag below the current piece
+            long betweenDiagBelowBottom, betweenDiagBelowTop;
+            if (startTop == 0) {
+                betweenDiagBelowTop = 0L;
+                if (blockingPieceDiagBelowBottom == 0)
+                    betweenDiagBelowBottom = piecesBelowBottom & diagMaskBottom;
+                else
+                    betweenDiagBelowBottom = piecesBelowBottom & (-blockingPieceDiagBelowBottom ^ blockingPieceDiagBelowBottom) & diagMaskBottom;
+            } else {
+                if (blockingPieceDiagBelowTop == 0) {
+                    betweenDiagBelowTop = piecesBelowTop & diagMaskTop;
+                    if (blockingPieceDiagBelowBottom == 0)
+                        betweenDiagBelowBottom = piecesBelowBottom & diagMaskBottom;
+                    else
+                        betweenDiagBelowBottom = (-blockingPieceDiagBelowBottom ^ blockingPieceDiagBelowBottom) & diagMaskBottom;
+                } else {
+                    betweenDiagBelowTop = piecesBelowTop & (-blockingPieceDiagBelowTop ^ blockingPieceDiagBelowTop) & diagMaskTop;
+                    betweenDiagBelowBottom = 0L;
+                }
+            }
+
+            // Get squares movable to in anti-diag above the current piece
+            long betweenAntiDiagAboveBottom, betweenAntiDiagAboveTop;
+            if (startTop != 0) {
+                betweenAntiDiagAboveBottom = 0L;
+                if (blockingPieceAntiDiagAboveTop == 0)
+                    betweenAntiDiagAboveTop = piecesAboveTop & antiDiagMaskTop;
+                else
+                    betweenAntiDiagAboveTop = piecesAboveTop & (blockingPieceAntiDiagAboveTop - 1) & antiDiagMaskTop;
+            } else {
+                if (blockingPieceAntiDiagAboveBottom == 0) {
+                    betweenAntiDiagAboveBottom = piecesAboveBottom & antiDiagMaskBottom;
+                    betweenAntiDiagAboveTop = (blockingPieceAntiDiagAboveTop - 1) & antiDiagMaskTop;
+                } else {
+                    betweenAntiDiagAboveBottom = piecesAboveBottom & (blockingPieceAntiDiagAboveBottom - 1) & antiDiagMaskBottom;
+                    betweenAntiDiagAboveTop = 0L;
+                }
+            }
+
+            // Get squares movable to in anti-diag below the current piece
+            long betweenAntiDiagBelowBottom, betweenAntiDiagBelowTop;
+            if (startTop == 0) {
+                betweenAntiDiagBelowTop = 0L;
+                if (blockingPieceAntiDiagBelowBottom == 0)
+                    betweenAntiDiagBelowBottom = piecesBelowBottom & antiDiagMaskBottom;
+                else
+                    betweenAntiDiagBelowBottom = piecesBelowBottom & (-blockingPieceAntiDiagBelowBottom ^ blockingPieceAntiDiagBelowBottom) & antiDiagMaskBottom;
+            } else {
+                if (blockingPieceAntiDiagBelowTop == 0) {
+                    betweenAntiDiagBelowTop = piecesBelowTop & antiDiagMaskTop;
+                    if (blockingPieceAntiDiagBelowBottom == 0)
+                        betweenAntiDiagBelowBottom = piecesBelowBottom & antiDiagMaskBottom;
+                    else
+                        betweenAntiDiagBelowBottom = (-blockingPieceAntiDiagBelowBottom ^ blockingPieceAntiDiagBelowBottom) & antiDiagMaskBottom;
+                } else {
+                    betweenAntiDiagBelowTop = piecesBelowTop & (-blockingPieceAntiDiagBelowTop ^ blockingPieceAntiDiagBelowTop) & antiDiagMaskTop;
+                    betweenAntiDiagBelowBottom = 0L;
+                }
+            }
+
+            // Or results onto the total reachable squares in pne move
+            long reachableTop = betweenColAboveTop | betweenColBelowTop | betweenRowAboveTop | betweenRowBelowTop | betweenDiagAboveTop | betweenDiagBelowTop | betweenAntiDiagAboveTop | betweenAntiDiagBelowTop;
+            long reachableBottom = betweenColAboveBottom | betweenColBelowBottom | betweenRowAboveBottom | betweenRowBelowBottom | betweenDiagAboveBottom | betweenDiagBelowBottom | betweenAntiDiagAboveBottom | betweenAntiDiagBelowBottom;
+            if (pieceNum < 4) {
+                blackReachableTop |= reachableTop;
+                blackReachableBottom |= reachableBottom;
+            } else {
+                whiteReachableTop |= reachableTop;
+                whiteReachableBottom |= reachableBottom;
+            }
+        }
+
+        // Put the squares that are reachable by both players in one move into a BitBoard for return
+        BitBoard reachable = new BitBoard();
+        reachable.setBlackQueensBottom(blackReachableBottom);
+        reachable.setBlackQueensTop(blackReachableTop);
+        reachable.setWhiteQueensBottom(whiteReachableBottom);
+        reachable.setWhiteQueensTop(whiteReachableTop);
+
+        return reachable;
+    }
+
+    private static int getCol(long startBottom, long startTop) {
+        if (startBottom == 0)
+            return Long.bitCount(startTop - 1) % 10;
+        else
+            return Long.bitCount(startBottom - 1) % 10;
+    }
+
+    private static int getRow(long startBottom, long startTop) {
+        if (startBottom == 0)
+            return Long.bitCount(startTop - 1) / 10 + 5;
+        else
+            return Long.bitCount(startBottom - 1) / 10;
     }
 
     public static int calculateTileControl(int x, int y, BitBoard board) {

@@ -1,4 +1,5 @@
 import State.State;
+import Tree.Heuristics;
 import Tree.MonteCarloTree;
 import ygraph.ai.smartfox.games.BaseGameGUI;
 import ygraph.ai.smartfox.games.GameClient;
@@ -132,10 +133,35 @@ public class Main extends GamePlayer {
 
     private void makeMove() {
         makeMonteCarloMove();
+//        theClown();
         depth++;
     }
 
+    private void theClown() {
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, colour);
+        Action definitelyTheBestAction = null;
+        double bestH = Math.pow(-1, colour) * Integer.MAX_VALUE;
+        for (Action a : actions) {
+            double h = Heuristics.bigPoppa(new State(state, a), colour);
+            if (colour == 1 && h > bestH) {
+                definitelyTheBestAction = a;
+                bestH = h;
+            } else if (colour == 2 && h < bestH) {
+                definitelyTheBestAction = a;
+                bestH = h;
+            }
+        }
+        if (definitelyTheBestAction == null) {
+            System.out.println("OPPONENT WINS!!");
+            System.exit(0);
+        }
+        state = new State(state, definitelyTheBestAction);
+        getGameClient().sendMoveMessage(definitelyTheBestAction.toServerResponse());
+        getGameGUI().updateGameState(definitelyTheBestAction.toServerResponse());
+    }
+
     private void makeMonteCarloMove() {
+        System.out.println("colour = " + colour);
         long start = System.currentTimeMillis();
         if (action != null)
             monteCarloTree.updateRoot(state, action, colour, depth);
