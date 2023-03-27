@@ -1,7 +1,9 @@
 package Tests;
 
 import State.*;
+import Tree.Heuristics;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,32 +25,121 @@ public class HeuristicTesting {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         )));
 
-
-        BitBoard b = randomState().getBitBoard();
+        State s = randomState();
+        BitBoard b = s.getBitBoard();
         System.out.println(b.boardToString());
-        BitBoard result = reachableInOneMove(b);
+        long n = (long) 1e6;
+        long start = System.nanoTime();
+        for (long i = 0; i < n; i++) {
+            Heuristics.bigPoppa(s,1);
+        }
+        long end = System.nanoTime();
+        System.out.println("Time: " + (end - start)  / n + "ns");
         BitBoard testBoard = new BitBoard();
 
+//        for (int y = 9; y >= 0; y--) {
+//            for (int x = 0; x < 10; x++) {
+//                if (result[0][y*10 + x] == 1000000) {
+//                    System.out.print("- ");
+//                } else {
+//                    System.out.print(result[0][y*10+x] + " ");
+//                }
+//            }
+//            System.out.println();
+//        }
 
-        testBoard.setArrowTop(result.getWhiteQueensTop());
-        testBoard.setArrowBottom(result.getWhiteQueensBottom());
-        System.out.println(testBoard.boardToString());
+//        testBoard.setArrowTop(result.getWhiteQueensTop());
+//        testBoard.setArrowBottom(result.getWhiteQueensBottom());
+//        System.out.println(testBoard.boardToString());
     }
 
-    public static BitBoard reachableInOneMove(BitBoard b) {
-        // Constants
-        long notAFile = 0b00000000010000000001000000000100000000010000000001L;
-        long notJFile = 0b10000000001000000000100000000010000000001000000000L;
-        long columnMask = 0b00000000010000000001000000000100000000010000000001L;
-        long rowMask = 0b1111111111L;
-        long diagonalMask = 0b10000000000100000000001000000000010000000000100000000001L;
-        long antiDiagonalMask = 0b000000001000000001000000001000000001000000001L;
-        long boardMask = -1L >>> (64 - 50);
+    private static int[][] D2(State s) {
+        // Clone input so as not to modify it
+        BitBoard input;
+        try {
+            input = (BitBoard) s.getBitBoard().clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
 
-        long whiteTop = b.getWhiteQueensTop();
-        long whiteBottom = b.getWhiteQueensBottom();
+        // Initialize reachable array. Indexed as [color][moveNum][top/bottom]
+        long[][][] reachable = new long[2][10][2];
+        BitBoard result;
+
+        for (int nMoves = 0; nMoves < 10; nMoves++) {
+            // Find all reachable squares
+            result = kingReachableInOneMove(State.BLACK_QUEEN, input);
+
+            reachable[0][nMoves][0] = result.getArrowTop();// result[0];
+            reachable[0][nMoves][1] = result.getArrowBottom();// result[1];
+
+            if (nMoves > 0) {
+                if (result.getArrowTop() == 0L && result.getArrowBottom() == 0L) {
+                    break;
+                }
+            }
+
+            input.setArrowTop(input.getArrowTop() | input.getBlackQueensTop());
+            input.setArrowBottom(input.getArrowBottom() | input.getBlackQueensBottom());
+            input.setBlackQueensTop(result.getArrowTop());
+            input.setBlackQueensBottom(result.getArrowBottom());
+        }
+
+        try {
+            input = (BitBoard) s.getBitBoard().clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (int nMoves = 0; nMoves < 10; nMoves++) {
+            // Find all reachable squares
+            result = kingReachableInOneMove(State.WHITE_QUEEN, input);
+
+            reachable[1][nMoves][0] = result.getArrowTop();// result[0];
+            reachable[1][nMoves][1] = result.getArrowTop();// result[1];
+
+            if (nMoves > 0) {
+                if (result.getArrowTop() == 0L && result.getArrowBottom() == 0L) {
+                    break;
+                }
+            }
+
+            input.setArrowTop(input.getArrowTop() | input.getWhiteQueensTop());
+            input.setArrowBottom(input.getArrowBottom() | input.getWhiteQueensBottom());
+            input.setWhiteQueensTop(result.getArrowTop());
+            input.setWhiteQueensBottom(result.getArrowBottom());
+        }
+
+        int[][] output = new int[2][100];
+
+        for (int color = 0; color < 2; color++) {
+            loop: for (int i = 0; i < 100; i++) {
+                for (int nMoves = 0; nMoves < 10; nMoves++) {
+                    if (i < 50 && (reachable[color][nMoves][1] & (1L << i)) != 0) {
+                        output[color][i] = nMoves + 1;
+                        continue loop;
+                    } else if (i >= 50 && (reachable[color][nMoves][0] & (1L << (i - 50))) != 0) {
+                        output[color][i] = nMoves + 1;
+                        continue loop;
+                    }
+                }
+                output[color][i] = 1000000;
+            }
+        }
+
+        return output;
+    }
+
+    private static BitBoard kingReachableInOneMove(int color, BitBoard b) {
+        long boardMask = -1L >>> (64 - 50);
+        long aroundMask = 0b11100000001010000000111L;
+        long notAFile = 0b11111111101111111110111111111011111111101111111110L;
+        long notJFile = 0b01111111110111111111011111111101111111110111111111L;
+
         long blackTop = b.getBlackQueensTop();
         long blackBottom = b.getBlackQueensBottom();
+        long whiteTop = b.getWhiteQueensTop();
+        long whiteBottom = b.getWhiteQueensBottom();
         long arrowTop = b.getArrowTop();
         long arrowBottom = b.getArrowBottom();
 
@@ -56,52 +147,261 @@ public class HeuristicTesting {
         long occupiedBottom = blackBottom | whiteBottom | arrowBottom;
 
         // All squares reachable in one move
-        long blackReachableTop = 0L;
-        long blackReachableBottom = 0L;
-        long whiteReachableTop = 0L;
-        long whiteReachableBottom = 0L;
+        long reachableTop = 0L;
+        long reachableBottom = 0L;
 
-        // Find black queens
-        long[] blackQueensTop = new long[4];
-        long[] blackQueensBottom = new long[4];
-        for (int i = 0; i < 4; i++) {
-            if (blackBottom > 1) {
-                blackQueensBottom[i] = Long.lowestOneBit(blackBottom);
-                blackQueensTop[i] = 0L;
-                blackBottom ^= blackQueensBottom[i];
-            } else {
-                blackQueensBottom[i] = 0L;
-                blackQueensTop[i] = Long.lowestOneBit(blackTop);
-                blackTop ^= blackQueensTop[i];
+        int queenCount;
+        long[] queensTop, queensBottom;
+
+        if (color == State.BLACK_QUEEN) {
+            // Find black queens
+            queenCount = Long.bitCount(blackTop) + Long.bitCount(blackBottom);
+            queensTop = new long[queenCount];
+            queensBottom = new long[queenCount];
+            for (int i = 0; i < queenCount; i++) {
+                if (blackBottom > 1) {
+                    queensBottom[i] = Long.lowestOneBit(blackBottom);
+                    queensTop[i] = 0L;
+                    blackBottom ^= queensBottom[i];
+                } else {
+                    queensBottom[i] = 0L;
+                    queensTop[i] = Long.lowestOneBit(blackTop);
+                    blackTop ^= queensTop[i];
+                }
+            }
+        } else {
+            // Find white queens
+            queenCount = Long.bitCount(whiteTop) + Long.bitCount(whiteBottom);
+            queensTop = new long[queenCount];
+            queensBottom = new long[queenCount];
+            for (int i = 0; i < queenCount; i++) {
+                if (whiteBottom > 1) {
+                    queensBottom[i] = Long.lowestOneBit(whiteBottom);
+                    queensTop[i] = 0L;
+                    whiteBottom ^= queensBottom[i];
+                } else {
+                    queensBottom[i] = 0L;
+                    queensTop[i] = Long.lowestOneBit(whiteTop);
+                    whiteTop ^= queensTop[i];
+                }
             }
         }
 
-        // Find white queens
-        long[] whiteQueensTop = new long[4];
-        long[] whiteQueensBottom = new long[4];
-        for (int i = 0; i < 4; i++) {
-            if (whiteBottom > 1) {
-                whiteQueensBottom[i] = Long.lowestOneBit(whiteBottom);
-                whiteQueensTop[i] = 0L;
-                whiteBottom ^= whiteQueensBottom[i];
-            } else {
-                whiteQueensBottom[i] = 0L;
-                whiteQueensTop[i] = Long.lowestOneBit(whiteTop);
-                whiteTop ^= whiteQueensTop[i];
-            }
-        }
 
-        for (int pieceNum = 0; pieceNum < 8; pieceNum++) {
+        // Find all reachable squares
+        for (int pieceNum = 0; pieceNum < queenCount; pieceNum++) {
 
             // The piece we are moving
-            long startBottom, startTop;
-            if (pieceNum < 4) {
-                startBottom = blackQueensBottom[pieceNum];
-                startTop = blackQueensTop[pieceNum];
+            long startBottom = queensBottom[pieceNum];
+            long startTop = queensTop[pieceNum];
+
+            ///////////////////
+            // Generate mask //
+            ///////////////////
+
+            int index;
+            if (startTop > 0) {
+                index = 50 + Long.numberOfTrailingZeros(startTop);
             } else {
-                startBottom = whiteQueensBottom[pieceNum - 4];
-                startTop = whiteQueensTop[pieceNum - 4];
+                index = Long.numberOfTrailingZeros(startBottom);
             }
+
+            long maskBottom, maskTop;
+            if (index > 39) {
+                if (index < 61)
+                    maskTop = aroundMask >>> (61 - index);
+                else
+                    maskTop = aroundMask << (index - 61);
+            } else {
+                maskTop = 0L;
+            }
+
+            if (index < 61) {
+                if (index < 11) {
+                    maskBottom = aroundMask >>> (11 - index);
+                } else {
+                    maskBottom = aroundMask << (index - 11);
+                }
+            } else {
+                maskBottom = 0L;
+            }
+
+            if (index % 10 == 0) {
+                maskTop &= notJFile;
+                maskBottom &= notJFile;
+            } else if (index % 10 == 9) {
+                maskTop &= notAFile;
+                maskBottom &= notAFile;
+            }
+
+            maskTop &= boardMask;
+            maskBottom &= boardMask;
+
+
+            // Actually get squares we can move to
+            reachableTop |= ~occupiedTop & maskTop;
+            reachableBottom |= ~occupiedBottom & maskBottom;
+        }
+
+        BitBoard out = new BitBoard();
+        out.setArrowTop(reachableTop);
+        out.setArrowBottom(reachableBottom);
+
+        return out;
+    }
+
+    /**
+     * Returns the minimum number of moves required to reach each square from the given state.
+     * @param b The state to start from
+     * @return A 2D array of integers. The first index is the color, the second is the square.
+     */
+    private static int[][] minMoves(BitBoard b) {
+        // Clone input so as not to modify it
+        BitBoard input;
+        try {
+            input = (BitBoard) b.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Initialize reachable array. Indexed as [color][moveNum][top/bottom]
+        long[][][] reachable = new long[2][10][2];
+        BitBoard result;
+
+        for (int nMoves = 0; nMoves < 10; nMoves++) {
+            // Find all reachable squares
+            result = reachableInOneMove(State.BLACK_QUEEN, input);
+
+            reachable[0][nMoves][0] = result.getArrowTop();// result[0];
+            reachable[0][nMoves][1] = result.getArrowBottom();// result[1];
+
+            if (nMoves > 0) {
+                if (result.getArrowTop() == 0L && result.getArrowBottom() == 0L) {
+                    break;
+                }
+            }
+
+            input.setArrowTop(input.getArrowTop() | input.getBlackQueensTop());
+            input.setArrowBottom(input.getArrowBottom() | input.getBlackQueensBottom());
+            input.setBlackQueensTop(result.getArrowTop());
+            input.setBlackQueensBottom(result.getArrowBottom());
+        }
+
+        try {
+            input = (BitBoard) b.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (int nMoves = 0; nMoves < 10; nMoves++) {
+            // Find all reachable squares
+            result = reachableInOneMove(State.WHITE_QUEEN, input);
+
+            reachable[1][nMoves][0] = result.getArrowTop();// result[0];
+            reachable[1][nMoves][1] = result.getArrowTop();// result[1];
+
+            if (nMoves > 0) {
+                if (result.getArrowTop() == 0L && result.getArrowBottom() == 0L) {
+                    break;
+                }
+            }
+
+            input.setArrowTop(input.getArrowTop() | input.getWhiteQueensTop());
+            input.setArrowBottom(input.getArrowBottom() | input.getWhiteQueensBottom());
+            input.setWhiteQueensTop(result.getArrowTop());
+            input.setWhiteQueensBottom(result.getArrowBottom());
+        }
+
+        int[][] output = new int[2][100];
+
+        for (int color = 0; color < 2; color++) {
+            loop: for (int i = 0; i < 100; i++) {
+                for (int nMoves = 0; nMoves < 10; nMoves++) {
+                    if (i < 50 && (reachable[color][nMoves][1] & (1L << i)) != 0) {
+                        output[color][i] = nMoves + 1;
+                        continue loop;
+                    } else if (i >= 50 && (reachable[color][nMoves][0] & (1L << (i - 50))) != 0) {
+                        output[color][i] = nMoves + 1;
+                        continue loop;
+                    }
+                }
+                output[color][i] = 1000000;
+            }
+        }
+
+        return output;
+    }
+
+    /**
+     * Returns a bitboard with all the reachable positions in one move from the given board. Uses almost only bitwise operations, making it very fast.
+     *
+     * @param b The board to find reachable positions from.
+     * @return A bitboard with all the reachable positions in one move from the given board for both colors.
+     */
+    private static BitBoard reachableInOneMove(int color, BitBoard b) {
+        // Constants
+        long columnMask = 0b00000000010000000001000000000100000000010000000001L;
+        long rowMask = 0b1111111111L;
+        long diagonalMask = 0b10000000000100000000001000000000010000000000100000000001L;
+        long antiDiagonalMask = 0b000000001000000001000000001000000001000000001L;
+        long boardMask = -1L >>> (64 - 50);
+
+        long blackTop = b.getBlackQueensTop();
+        long blackBottom = b.getBlackQueensBottom();
+        long whiteTop = b.getWhiteQueensTop();
+        long whiteBottom = b.getWhiteQueensBottom();
+        long arrowTop = b.getArrowTop();
+        long arrowBottom = b.getArrowBottom();
+
+        long occupiedTop = blackTop | whiteTop | arrowTop;
+        long occupiedBottom = blackBottom | whiteBottom | arrowBottom;
+
+        // All squares reachable in one move
+        long reachableTop = 0L;
+        long reachableBottom = 0L;
+
+        int queenCount;
+        long[] queensTop, queensBottom;
+
+        if (color == State.BLACK_QUEEN) {
+            // Find black queens
+            queenCount = Long.bitCount(blackTop) + Long.bitCount(blackBottom);
+            queensTop = new long[queenCount];
+            queensBottom = new long[queenCount];
+            for (int i = 0; i < queenCount; i++) {
+                if (blackBottom > 1) {
+                    queensBottom[i] = Long.lowestOneBit(blackBottom);
+                    queensTop[i] = 0L;
+                    blackBottom ^= queensBottom[i];
+                } else {
+                    queensBottom[i] = 0L;
+                    queensTop[i] = Long.lowestOneBit(blackTop);
+                    blackTop ^= queensTop[i];
+                }
+            }
+        } else {
+            // Find white queens
+            queenCount = Long.bitCount(whiteTop) + Long.bitCount(whiteBottom);
+            queensTop = new long[queenCount];
+            queensBottom = new long[queenCount];
+            for (int i = 0; i < queenCount; i++) {
+                if (whiteBottom > 1) {
+                    queensBottom[i] = Long.lowestOneBit(whiteBottom);
+                    queensTop[i] = 0L;
+                    whiteBottom ^= queensBottom[i];
+                } else {
+                    queensBottom[i] = 0L;
+                    queensTop[i] = Long.lowestOneBit(whiteTop);
+                    whiteTop ^= queensTop[i];
+                }
+            }
+        }
+
+        for (int pieceNum = 0; pieceNum < queenCount; pieceNum++) {
+
+            // The piece we are moving
+            long startBottom = queensBottom[pieceNum];
+            long startTop = queensTop[pieceNum];
 
             int startRow = getRow(startBottom, startTop);
             int startCol = getCol(startBottom, startTop);
@@ -468,25 +768,16 @@ public class HeuristicTesting {
             }
 
             // Or results onto the total reachable squares in pne move
-            long reachableTop = betweenColAboveTop | betweenColBelowTop | betweenRowAboveTop | betweenRowBelowTop | betweenDiagAboveTop | betweenDiagBelowTop | betweenAntiDiagAboveTop | betweenAntiDiagBelowTop;
-            long reachableBottom = betweenColAboveBottom | betweenColBelowBottom | betweenRowAboveBottom | betweenRowBelowBottom | betweenDiagAboveBottom | betweenDiagBelowBottom | betweenAntiDiagAboveBottom | betweenAntiDiagBelowBottom;
-            if (pieceNum < 4) {
-                blackReachableTop |= reachableTop;
-                blackReachableBottom |= reachableBottom;
-            } else {
-                whiteReachableTop |= reachableTop;
-                whiteReachableBottom |= reachableBottom;
-            }
+            reachableTop |= betweenColAboveTop | betweenColBelowTop | betweenRowAboveTop | betweenRowBelowTop | betweenDiagAboveTop | betweenDiagBelowTop | betweenAntiDiagAboveTop | betweenAntiDiagBelowTop;
+            reachableBottom |= betweenColAboveBottom | betweenColBelowBottom | betweenRowAboveBottom | betweenRowBelowBottom | betweenDiagAboveBottom | betweenDiagBelowBottom | betweenAntiDiagAboveBottom | betweenAntiDiagBelowBottom;
         }
 
-        // Put the squares that are reachable by both players in one move into a BitBoard for return
-        BitBoard reachable = new BitBoard();
-        reachable.setBlackQueensBottom(blackReachableBottom);
-        reachable.setBlackQueensTop(blackReachableTop);
-        reachable.setWhiteQueensBottom(whiteReachableBottom);
-        reachable.setWhiteQueensTop(whiteReachableTop);
-
-        return reachable;
+        // Return the reachable squares
+        BitBoard out = new BitBoard();
+        out.setArrowTop(reachableTop);
+        out.setArrowBottom(reachableBottom);
+        return out;
+//        return new long[]{reachableTop, reachableBottom};
     }
 
     private static int getCol(long startBottom, long startTop) {
