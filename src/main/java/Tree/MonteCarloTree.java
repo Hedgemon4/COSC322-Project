@@ -20,7 +20,6 @@ public class MonteCarloTree {
      * The number of nodes that the expansion policy will attempt to expand. May expand less if there aren't that many nodes left to expand
      */
     private final int NUM_TO_EXPAND = Runtime.getRuntime().availableProcessors();
-
     private ExecutorService executor;
 
     public MonteCarloTree(State state, double cValue, int colour, int depth, int[] moveDictionary) {
@@ -28,12 +27,12 @@ public class MonteCarloTree {
         root = new Node(state, colour, depth);
         this.moveDictionary = moveDictionary;
         // Create a thread pool with the number of threads available on this computer
+        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     public Action search() {
-        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Node tree = root;
-        Timer time = new Timer(29.5);
+        Timer time = new Timer(28);
         /*
             At the start of the game, we use a move dictionary to find out move, and then we use the saved time to start
             searching our tree.
@@ -59,25 +58,26 @@ public class MonteCarloTree {
                 // Simulate each child in its own Thread
 
                 // Create a list of runnable tasks that will be executed in separate threads
-                List<Callable<Double>> callables = new ArrayList<>();
-                for (Node child : children)
-                    callables.add(() -> Simulate.simulate(child));
-
-                try {
-                    // Execute all tasks. Will block until all threads have returned a value
-                    List<Future<Double>> futures = executor.invokeAll(callables);
-
-                    // Backpropagation of results
-                    for (int i = 0; i < children.length; i++) {
-                        Future<Double> future = futures.get(i);
-                        double result = future.get();
-                        backPropagate(result, children[i]);
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
+                List<Callable<Integer>> callables = new ArrayList<>();
+                for (Node child : children) {
+                    backPropagate(Simulate.simulate(child), child);
+//                    callables.add(() -> Simulate.simulate(child));
                 }
+
+//                try {
+//                    // Execute all tasks. Will block until all threads have returned a value
+//                    List<Future<Integer>> futures = executor.invokeAll(callables);
+//
+//                    // Backpropagation of results
+//                    for (int i = 0; i < children.length; i++) {
+//                        Future<Integer> future = futures.get(i);
+//                        int result = future.get();
+//                        backPropagate(result, children[i]);
+//                    }
+//                } catch (InterruptedException | ExecutionException e) {
+//                    throw new RuntimeException(e);
+//                }
             }
-            executor.shutdownNow();
         } catch (NullPointerException ignore) {
         }
 
@@ -103,45 +103,45 @@ public class MonteCarloTree {
      * @param result The player that won. Either State.BLACK or State.WHITE
      * @param child  The child node that was just simulated
      */
-//    private void backPropagate(int result, Node child) {
-//        if (child.getColour() != result) {
-//            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-//            child.setTotalWins(child.getTotalWins() + 1);
-//        } else {
-//            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-//        }
-//
-//        while (child.getParent() != null) {
-//            child = child.getParent();
-//            if (child.getColour() != result) {
-//                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-//                child.setTotalWins(child.getTotalWins() + 1);
-//            } else {
-//                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-//            }
-//        }
-//    }
-
-    private void backPropagate(double result, Node child) {
-        if (child.getColour() != State.BLACK_QUEEN) {
+    private void backPropagate(int result, Node child) {
+        if (child.getColour() != result) {
             child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-            child.setTotalWins(child.getTotalWins() + result);
+            child.setTotalWins(child.getTotalWins() + 1);
         } else {
             child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-            child.setTotalWins(child.getTotalWins() - result);
         }
 
         while (child.getParent() != null) {
             child = child.getParent();
-            if (child.getColour() != State.BLACK_QUEEN) {
+            if (child.getColour() != result) {
                 child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-                child.setTotalWins(child.getTotalWins() + result);
+                child.setTotalWins(child.getTotalWins() + 1);
             } else {
                 child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-                child.setTotalWins(child.getTotalWins() - result);
             }
         }
     }
+
+//    private void backPropagate(double result, Node child) {
+//        if (child.getColour() != State.BLACK_QUEEN) {
+//            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+//            child.setTotalWins(child.getTotalWins() + result);
+//        } else {
+//            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+//            child.setTotalWins(child.getTotalWins() - result);
+//        }
+//
+//        while (child.getParent() != null) {
+//            child = child.getParent();
+//            if (child.getColour() != State.BLACK_QUEEN) {
+//                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+//                child.setTotalWins(child.getTotalWins() + result);
+//            } else {
+//                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+//                child.setTotalWins(child.getTotalWins() - result);
+//            }
+//        }
+//    }
 
     private Node mostVisitedNode() {
         Node bestNode = null;

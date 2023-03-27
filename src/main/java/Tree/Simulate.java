@@ -3,8 +3,10 @@ package Tree;
 import State.*;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Simulate {
+    private static Random r = new Random();
 
     /**
      * We perform a playout from the newly generated child node, choosing moves for both players according to the playout policy. These moves are not recorded in the search tree. In the figure, the simulation results in a win for black.
@@ -12,9 +14,9 @@ public class Simulate {
      * @param node The Node to be played out
      * @return The player that won. Either State.BLACK or State.WHITE
      */
-    public static double simulate(Node node) {
-//        return earlyTerminationPlayout(node);
-        return heuristicSimulation(node);
+    public static int simulate(Node node) {
+        return earlyTerminationPlayout(node);
+//        return heuristicSimulation(node);
     }
 
     private static double heuristicSimulation(Node node) {
@@ -79,7 +81,7 @@ public class Simulate {
 
     private static int earlyTerminationPlayout(Node node) {
         int i = 0;
-        final int TERMINATION_DEPTH = 35;
+        final int TERMINATION_DEPTH = r.nextInt(3) + 5;
         State state = new State(node.getState(), node.getAction());
         int color = node.getColour();
         int depth = node.getDepth();
@@ -95,19 +97,19 @@ public class Simulate {
         if (i < TERMINATION_DEPTH)
             return color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
         else {
-            int blackControl = boardControlHeuristic(state, State.BLACK_QUEEN);
-            int whiteControl = boardControlHeuristic(state, State.WHITE_QUEEN);
-            if (blackControl == whiteControl)
-                return 0;
-            else if (blackControl > whiteControl)
-                return State.BLACK_QUEEN;
-            else
-                return State.WHITE_QUEEN;
-//            double heuristic = Heuristics.bigPoppa(state, node.getColour());
-//            if (heuristic > 0)
+//            int blackControl = boardControlHeuristic(state, State.BLACK_QUEEN);
+//            int whiteControl = boardControlHeuristic(state, State.WHITE_QUEEN);
+//            if (blackControl == whiteControl)
+//                return 0;
+//            else if (blackControl > whiteControl)
 //                return State.BLACK_QUEEN;
 //            else
 //                return State.WHITE_QUEEN;
+            double heuristic = Heuristics.bigPoppa(state, color);
+            if (heuristic > 0)
+                return State.BLACK_QUEEN;
+            else
+                return State.WHITE_QUEEN;
         }
     }
 
