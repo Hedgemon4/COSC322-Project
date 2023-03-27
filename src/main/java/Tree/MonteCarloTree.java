@@ -21,17 +21,17 @@ public class MonteCarloTree {
      */
     private final int NUM_TO_EXPAND = Runtime.getRuntime().availableProcessors();
 
-    private final ExecutorService executor;
+    private ExecutorService executor;
 
     public MonteCarloTree(State state, double cValue, int colour, int depth, int[] moveDictionary) {
         this.cValue = cValue;
         root = new Node(state, colour, depth);
         this.moveDictionary = moveDictionary;
         // Create a thread pool with the number of threads available on this computer
-        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     public Action search() {
+        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Node tree = root;
         Timer time = new Timer(29.5);
         /*
@@ -77,6 +77,7 @@ public class MonteCarloTree {
                     throw new RuntimeException(e);
                 }
             }
+            executor.shutdownNow();
         } catch (NullPointerException ignore) {
         }
 

@@ -27,10 +27,10 @@ public class Heuristics {
     public static double bigPoppa(State s, int playerToMove) {
 //        long start = System.nanoTime();
         // Check to see if we have previously evaluated this state
-//        long hash = ZobristHash.zobristHash(s.getBitBoard(), playerToMove);
-//        Double heuristic = previouslyEvaluated.get(hash);
-//        if (heuristic != null)
-//            return heuristic;
+        long hash = ZobristHash.zobristHash(s.getBitBoard(), playerToMove);
+        Double heuristic = previouslyEvaluated.get(hash);
+        if (heuristic != null)
+            return heuristic;
 //        long end = System.nanoTime();
 //        System.out.println("Hashing took " + (end - start) + "ns");
 
@@ -60,15 +60,15 @@ public class Heuristics {
 
         double[] f = f(w);
 
-        double heuristic = f[0] * t1 + f[1] * c1 + f[2] * c2 + f[3] * t2;
+        heuristic = f[0] * t1 + f[1] * c1 + f[2] * c2 + f[3] * t2;
 
 //        start = System.nanoTime();
-//        previouslyEvaluated.put(hash, heuristic);
+        previouslyEvaluated.put(hash, heuristic);
 //        end = System.nanoTime();
 //        System.out.println("put took " + (end - start) + "ns");
 
         // 87 is the estimated maximum value of the heuristic, so this just normalizes the output to be in the range of -1 to 1
-        return heuristic;
+        return heuristic / 87;
     }
 
     private static double[] f(double w) {
