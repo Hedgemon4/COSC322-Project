@@ -32,7 +32,7 @@ public class MonteCarloTree {
 
     public Action search() {
         Node tree = root;
-        Timer time = new Timer(29.5);
+        Timer time = new Timer(28);
         /*
             At the start of the game, we use a move dictionary to find out move, and then we use the saved time to start
             searching our tree.
