@@ -38,11 +38,9 @@ public class MonteCarloTree {
             searching our tree.
          */
 
-        Action selectedAction = null;
-
-        boolean useMoveDictionary = root.getDepth() < 8;
+        boolean useMoveDictionary = root.getDepth() < 6;
         if (useMoveDictionary) {
-            selectedAction = getMoveDictionaryMove();
+            return getMoveDictionaryMove();
         }
         try {
             while (time.timeLeft()) {
@@ -58,7 +56,7 @@ public class MonteCarloTree {
                 // Simulate each child in its own Thread
 
                 // Create a list of runnable tasks that will be executed in separate threads
-                List<Callable<Integer>> callables = new ArrayList<>();
+                List<Callable<Double>> callables = new ArrayList<>();
                 for (Node child : children) {
                     backPropagate(Simulate.simulate(child), child);
 //                    callables.add(() -> Simulate.simulate(child));
@@ -66,12 +64,12 @@ public class MonteCarloTree {
 
 //                try {
 //                    // Execute all tasks. Will block until all threads have returned a value
-//                    List<Future<Integer>> futures = executor.invokeAll(callables);
+//                    List<Future<Double>> futures = executor.invokeAll(callables);
 //
 //                    // Backpropagation of results
 //                    for (int i = 0; i < children.length; i++) {
-//                        Future<Integer> future = futures.get(i);
-//                        int result = future.get();
+//                        Future<Double> future = futures.get(i);
+//                        double result = future.get();
 //                        backPropagate(result, children[i]);
 //                    }
 //                } catch (InterruptedException | ExecutionException e) {
@@ -83,10 +81,12 @@ public class MonteCarloTree {
 
         System.out.println("Ran " + getRoot().getTotalPlayouts() + " times");
 
-        if (mostVisitedNode() != null && !useMoveDictionary)
-            selectedAction = mostVisitedNode().getAction();
+        Node mostVisitedNode = mostVisitedNode();
+        if (mostVisitedNode != null)
+            return mostVisitedNode.getAction();
 
-        return selectedAction;
+        // End of game
+        return null;
     }
 
     private Node select(Node tree) {
@@ -122,26 +122,26 @@ public class MonteCarloTree {
         }
     }
 
-//    private void backPropagate(double result, Node child) {
-//        if (child.getColour() != State.BLACK_QUEEN) {
-//            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-//            child.setTotalWins(child.getTotalWins() + result);
-//        } else {
-//            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-//            child.setTotalWins(child.getTotalWins() - result);
-//        }
-//
-//        while (child.getParent() != null) {
-//            child = child.getParent();
-//            if (child.getColour() != State.BLACK_QUEEN) {
-//                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-//                child.setTotalWins(child.getTotalWins() + result);
-//            } else {
-//                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
-//                child.setTotalWins(child.getTotalWins() - result);
-//            }
-//        }
-//    }
+    private void backPropagate(double result, Node child) {
+        if (child.getColour() != State.BLACK_QUEEN) {
+            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+            child.setTotalWins(child.getTotalWins() + result);
+        } else {
+            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+            child.setTotalWins(child.getTotalWins() + (1 - result));
+        }
+
+        while (child.getParent() != null) {
+            child = child.getParent();
+            if (child.getColour() != State.BLACK_QUEEN) {
+                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+                child.setTotalWins(child.getTotalWins() + result);
+            } else {
+                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+                child.setTotalWins(child.getTotalWins() + (1 - result));
+            }
+        }
+    }
 
     private Node mostVisitedNode() {
         Node bestNode = null;
@@ -175,7 +175,7 @@ public class MonteCarloTree {
     }
 
     private double UCBEquation(Node n) {
-        return (double) n.getTotalWins() / n.getTotalPlayouts() + cValue * Math.sqrt(Math.log((double) n.getParent().getTotalPlayouts() / n.getTotalPlayouts()));
+        return (double) n.getTotalWins() / n.getTotalPlayouts() + cValue * Math.sqrt(Math.log((double) n.getParent().getTotalPlayouts()) / n.getTotalPlayouts());
     }
 
     private Action getMoveDictionaryMove() {

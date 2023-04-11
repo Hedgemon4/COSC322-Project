@@ -25,50 +25,32 @@ public class Heuristics {
     private static final HashMap<Long, Double> previouslyEvaluated = new HashMap<>();
 
     public static double bigPoppa(State s, int playerToMove) {
-//        long start = System.nanoTime();
         // Check to see if we have previously evaluated this state
         long hash = ZobristHash.zobristHash(s.getBitBoard(), playerToMove);
         Double heuristic = previouslyEvaluated.get(hash);
         if (heuristic != null)
             return heuristic;
-//        long end = System.nanoTime();
-//        System.out.println("Hashing took " + (end - start) + "ns");
 
-//        start = System.nanoTime();
         // Else evaluate it
         int[][] D1 = D1(s);
         int[][] D2 = D2(s);
-//        end = System.nanoTime();
-//        System.out.println("D took " + (end - start) + "ns");
 
-//        start = System.nanoTime();
         double t1 = t(D1, playerToMove);
         double t2 = t(D2, playerToMove);
-//        end = System.nanoTime();
-//        System.out.println("t took " + (end - start) + "ns");
 
 //        start = System.nanoTime();
         double c1 = c(1, D1);
         double c2 = c(2, D2);
-//        end = System.nanoTime();
-//        System.out.println("c took " + (end - start) + "ns");
 
-//        start = System.nanoTime();
         double w = w(D1);
-//        end = System.nanoTime();
-//        System.out.println("w took " + (end - start) + "ns");
 
-        double[] f = f(w);
+        double[] f = planBf(w);
 
         heuristic = f[0] * t1 + f[1] * c1 + f[2] * c2 + f[3] * t2;
 
-//        start = System.nanoTime();
         previouslyEvaluated.put(hash, heuristic);
-//        end = System.nanoTime();
-//        System.out.println("put took " + (end - start) + "ns");
 
-        // 87 is the estimated maximum value of the heuristic, so this just normalizes the output to be in the range of -1 to 1
-        return heuristic / 87;
+        return heuristic;
     }
 
     private static double[] f(double w) {
@@ -84,8 +66,16 @@ public class Heuristics {
         return f;
     }
 
+
     private static double f1(double w, double a) {
         return 4 * Math.exp(-a * w) / Math.pow(1 + Math.exp(-a * w), 2);
+    }
+
+    private static double[] planBf(double w) {
+        double[] f = new double[4];
+        f[0] = (100 - w) / 100;
+        f[1] = f[2] = f[3] = (1 - f[0]) / 3;
+        return f;
     }
 
     private static double w(int[][] D) {

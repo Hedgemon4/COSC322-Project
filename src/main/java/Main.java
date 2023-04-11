@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Scanner;
 
 import State.*;
 
@@ -28,7 +29,7 @@ public class Main extends GamePlayer {
     private int colour;
 
     private MonteCarloTree monteCarloTree;
-    private final double cValue = 2.0;
+    private final double cValue = 1.4;
     private int depth = 0;
     private static int[] moveDictionary;
 
@@ -39,8 +40,10 @@ public class Main extends GamePlayer {
      */
     public static void main(String[] args) {
         GamePlayer player;
+        String name = "new";
+        System.out.println(name);
         if (args.length == 2)
-            player = new Main(args[0] + "-" + ((int) (Math.random() * 1000)), args[1]);
+            player = new Main(name, args[1]);
         else
             player = new HumanPlayer();
 
@@ -153,7 +156,7 @@ public class Main extends GamePlayer {
         }
         if (definitelyTheBestAction == null) {
             System.out.println("OPPONENT WINS!!");
-            System.exit(0);
+            new Scanner(System.in).nextLine();
         }
         state = new State(state, definitelyTheBestAction);
         getGameClient().sendMoveMessage(definitelyTheBestAction.toServerResponse());
@@ -164,7 +167,7 @@ public class Main extends GamePlayer {
         System.out.println("colour = " + colour);
         long start = System.currentTimeMillis();
         if (action != null)
-            monteCarloTree.updateRoot(state, action, colour, depth);
+            monteCarloTree = new MonteCarloTree(state, cValue, colour, depth, moveDictionary);
         Action definitelyTheBestAction = monteCarloTree.search();
         if (definitelyTheBestAction == null) {
             System.out.println("OPPONENT WINS!!");

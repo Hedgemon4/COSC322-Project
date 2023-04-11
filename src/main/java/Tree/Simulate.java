@@ -14,20 +14,16 @@ public class Simulate {
      * @param node The Node to be played out
      * @return The player that won. Either State.BLACK or State.WHITE
      */
-    public static int simulate(Node node) {
-        return earlyTerminationPlayout(node);
-//        return heuristicSimulation(node);
+    public static double simulate(Node node) {
+//        return earlyTerminationPlayout(node);
+        return heuristicSimulation(node);
     }
 
     private static double heuristicSimulation(Node node) {
         State state = node.getState();
 
         double heuristic = Heuristics.bigPoppa(state, node.getColour());
-        return heuristic;
-//        if (heuristic > 0)
-//            return State.BLACK_QUEEN;
-//        else
-//            return State.WHITE_QUEEN;
+        return 1 / (1 + Math.exp(-3*heuristic));
     }
 
 
