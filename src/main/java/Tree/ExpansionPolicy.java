@@ -6,26 +6,76 @@ import State.State;
 import State.BitBoard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.PriorityQueue;
 
 public class ExpansionPolicy {
 
     public static Node[] expansionNode(Node node, int numToExpand) {
-        return bitBoardLibertyExpansionPolicy(node, numToExpand);
+//        return bitBoardLibertyExpansionPolicy(node, numToExpand);
+//        return heuristicExpansion(node, numToExpand);
+        return randomExpansion(node, numToExpand);
     }
 
-    private static Node randomExpansion(Node node) {
-        int randomInt = (int) (Math.random() * node.getPossibleActions().length);
-        while (node.getChildren()[randomInt] != null) {
-            randomInt = (int) (Math.random() * node.getPossibleActions().length);
+    private static Node[] heuristicExpansion(Node node, int numToExpand) {
+        int colour = node.getColour();
+        Action[] actions = node.getPossibleActions();
+        Node[] children = node.getChildren();
+        int definitelyTheBestAction = 0;
+        double bestH = Math.pow(-1, colour) * Integer.MAX_VALUE;
+        for (int i = 0; i < actions.length; i++) {
+            if (children[i] == null) {
+                Action a = actions[i];
+                double h = Heuristics.bigPoppa(new State(node.getState(), a), colour);
+                if (colour == 1 && h > bestH) {
+                    definitelyTheBestAction = i;
+                    bestH = h;
+                } else if (colour == 2 && h < bestH) {
+                    definitelyTheBestAction = i;
+                    bestH = h;
+                }
+            }
         }
-        Action randomAction = node.getPossibleActions()[randomInt];
-        State state = new State(node.getState(), randomAction);
-        int colour = node.getColour() == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
-        Action[] actions = ActionGenerator.generateActions(state, colour).toArray(new Action[0]);
-        Node expansion = new Node(state, randomAction, node, colour, 0, 0, actions, node.getDepth() + 1);
-        node.getChildren()[randomInt] = expansion;
-        return expansion;
+
+        State state = node.getState();
+        colour = node.getColour() == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
+        State newState = new State(state, actions[definitelyTheBestAction]);
+        Action[] newActions = ActionGenerator.generateActions(newState, colour).toArray(new Action[0]);
+        Node expansion = new Node(newState, actions[definitelyTheBestAction], node, colour, 0, 0, newActions, node.getDepth() + 1);
+        node.getChildren()[definitelyTheBestAction] = expansion;
+
+        return new Node[]{expansion};
+    }
+
+    private static Node[] randomExpansion(Node node, int numToExpand) {
+        // Count the number of children that are null
+        int numNull = 0;
+        for (Node child : node.getChildren()) {
+            if (child == null) {
+                numNull++;
+            }
+        }
+
+        if (numNull < numToExpand) {
+            numToExpand = numNull;
+        }
+
+        ArrayList<Node> expanded = new ArrayList<>();
+        for (int i = 0; i < numToExpand; i++) {
+            int randomInt = (int) (Math.random() * node.getPossibleActions().length);
+            while (node.getChildren()[randomInt] != null) {
+                randomInt = (int) (Math.random() * node.getPossibleActions().length);
+            }
+            Action randomAction = node.getPossibleActions()[randomInt];
+            State state = new State(node.getState(), randomAction);
+            int colour = node.getColour() == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
+            Action[] actions = ActionGenerator.generateActions(state, colour).toArray(new Action[0]);
+            Node expansion = new Node(state, randomAction, node, colour, 0, 0, actions, node.getDepth() + 1);
+            node.getChildren()[randomInt] = expansion;
+
+            expanded.add(expansion);
+        }
+        return expanded.toArray(new Node[0]);
     }
 
     private static Node[] bitBoardLibertyExpansionPolicy(Node node, int numToExpand) {

@@ -1,4 +1,5 @@
 import State.State;
+import Tree.Heuristics;
 import Tree.MonteCarloTree;
 import ygraph.ai.smartfox.games.BaseGameGUI;
 import ygraph.ai.smartfox.games.GameClient;
@@ -11,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Scanner;
 
 import State.*;
 
@@ -27,7 +29,7 @@ public class Main extends GamePlayer {
     private int colour;
 
     private MonteCarloTree monteCarloTree;
-    private final double cValue = 2.0;
+    private final double cValue = 1.4;
     private int depth = 0;
     private static int[] moveDictionary;
 
@@ -38,8 +40,10 @@ public class Main extends GamePlayer {
      */
     public static void main(String[] args) {
         GamePlayer player;
+        String name = "new";
+        System.out.println(name);
         if (args.length == 2)
-            player = new Main(args[0] + "-" + ((int) (Math.random() * 1000)), args[1]);
+            player = new Main(name, args[1]);
         else
             player = new HumanPlayer();
 
@@ -132,13 +136,38 @@ public class Main extends GamePlayer {
 
     private void makeMove() {
         makeMonteCarloMove();
+//        theClown();
         depth++;
     }
 
+    private void theClown() {
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, colour);
+        Action definitelyTheBestAction = null;
+        double bestH = Math.pow(-1, colour) * Integer.MAX_VALUE;
+        for (Action a : actions) {
+            double h = Heuristics.bigPoppa(new State(state, a), colour);
+            if (colour == 1 && h > bestH) {
+                definitelyTheBestAction = a;
+                bestH = h;
+            } else if (colour == 2 && h < bestH) {
+                definitelyTheBestAction = a;
+                bestH = h;
+            }
+        }
+        if (definitelyTheBestAction == null) {
+            System.out.println("OPPONENT WINS!!");
+            new Scanner(System.in).nextLine();
+        }
+        state = new State(state, definitelyTheBestAction);
+        getGameClient().sendMoveMessage(definitelyTheBestAction.toServerResponse());
+        getGameGUI().updateGameState(definitelyTheBestAction.toServerResponse());
+    }
+
     private void makeMonteCarloMove() {
+        System.out.println("colour = " + colour);
         long start = System.currentTimeMillis();
         if (action != null)
-            monteCarloTree.updateRoot(state, action, colour, depth);
+            monteCarloTree = new MonteCarloTree(state, cValue, colour, depth, moveDictionary);
         Action definitelyTheBestAction = monteCarloTree.search();
         if (definitelyTheBestAction == null) {
             System.out.println("OPPONENT WINS!!");

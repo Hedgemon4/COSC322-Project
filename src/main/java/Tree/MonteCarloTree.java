@@ -1,6 +1,7 @@
 package Tree;
 
-import State.*;
+import State.Action;
+import State.State;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,8 +20,7 @@ public class MonteCarloTree {
      * The number of nodes that the expansion policy will attempt to expand. May expand less if there aren't that many nodes left to expand
      */
     private final int NUM_TO_EXPAND = Runtime.getRuntime().availableProcessors();
-
-    private final ExecutorService executor;
+    private ExecutorService executor;
 
     public MonteCarloTree(State state, double cValue, int colour, int depth, int[] moveDictionary) {
         this.cValue = cValue;
@@ -38,11 +38,9 @@ public class MonteCarloTree {
             searching our tree.
          */
 
-        Action selectedAction = null;
-
-        boolean useMoveDictionary = root.getDepth() < 8;
+        boolean useMoveDictionary = root.getDepth() < 6;
         if (useMoveDictionary) {
-            selectedAction = getMoveDictionaryMove();
+            return getMoveDictionaryMove();
         }
         try {
             while (time.timeLeft()) {
@@ -51,39 +49,44 @@ public class MonteCarloTree {
                 // Get most promising nodes to simulate
                 Node[] children = ExpansionPolicy.expansionNode(leaf, NUM_TO_EXPAND);
 
-                // Simulate each child in its own Thread
                 // There should never be zero nodes returned because select() should not have chosen it
                 if (children.length == 0)
-                    throw new RuntimeException("HELP, THIS IS BAD");
+                    throw new RuntimeException("HELP, THIS IS BAD " + root.getTotalPlayouts());
+
+                // Simulate each child in its own Thread
 
                 // Create a list of runnable tasks that will be executed in separate threads
-                List<Callable<Integer>> callables = new ArrayList<>();
-                for (Node child : children)
-                    callables.add(() -> Simulate.simulate(child));
-
-                try {
-                    // Execute all tasks. Will block until all threads have returned a value
-                    List<Future<Integer>> futures = executor.invokeAll(callables);
-
-                    // Backpropagation of results
-                    for (int i = 0; i < children.length; i++) {
-                        Future<Integer> future = futures.get(i);
-                        int result = future.get();
-                        backPropagate(result, children[i]);
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
+                List<Callable<Double>> callables = new ArrayList<>();
+                for (Node child : children) {
+                    backPropagate(Simulate.simulate(child), child);
+//                    callables.add(() -> Simulate.simulate(child));
                 }
+
+//                try {
+//                    // Execute all tasks. Will block until all threads have returned a value
+//                    List<Future<Double>> futures = executor.invokeAll(callables);
+//
+//                    // Backpropagation of results
+//                    for (int i = 0; i < children.length; i++) {
+//                        Future<Double> future = futures.get(i);
+//                        double result = future.get();
+//                        backPropagate(result, children[i]);
+//                    }
+//                } catch (InterruptedException | ExecutionException e) {
+//                    throw new RuntimeException(e);
+//                }
             }
         } catch (NullPointerException ignore) {
         }
 
         System.out.println("Ran " + getRoot().getTotalPlayouts() + " times");
 
-        if (mostVisitedNode() != null && !useMoveDictionary)
-            selectedAction = mostVisitedNode().getAction();
+        Node mostVisitedNode = mostVisitedNode();
+        if (mostVisitedNode != null)
+            return mostVisitedNode.getAction();
 
-        return selectedAction;
+        // End of game
+        return null;
     }
 
     private Node select(Node tree) {
@@ -115,6 +118,27 @@ public class MonteCarloTree {
                 child.setTotalWins(child.getTotalWins() + 1);
             } else {
                 child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+            }
+        }
+    }
+
+    private void backPropagate(double result, Node child) {
+        if (child.getColour() != State.BLACK_QUEEN) {
+            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+            child.setTotalWins(child.getTotalWins() + result);
+        } else {
+            child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+            child.setTotalWins(child.getTotalWins() + (1 - result));
+        }
+
+        while (child.getParent() != null) {
+            child = child.getParent();
+            if (child.getColour() != State.BLACK_QUEEN) {
+                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+                child.setTotalWins(child.getTotalWins() + result);
+            } else {
+                child.setTotalPlayouts(child.getTotalPlayouts() + 1);
+                child.setTotalWins(child.getTotalWins() + (1 - result));
             }
         }
     }
@@ -151,7 +175,7 @@ public class MonteCarloTree {
     }
 
     private double UCBEquation(Node n) {
-        return (double) n.getTotalWins() / n.getTotalPlayouts() + cValue * Math.sqrt(Math.log((double) n.getParent().getTotalPlayouts() / n.getTotalPlayouts()));
+        return (double) n.getTotalWins() / n.getTotalPlayouts() + cValue * Math.sqrt(Math.log((double) n.getParent().getTotalPlayouts()) / n.getTotalPlayouts());
     }
 
     private Action getMoveDictionaryMove() {
