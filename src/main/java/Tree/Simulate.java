@@ -3,6 +3,8 @@ package Tree;
 import State.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.PriorityQueue;
 
 public class Simulate {
 
@@ -14,6 +16,10 @@ public class Simulate {
      */
     public static int simulate(Node node) {
         return earlyTerminationPlayout(node);
+    }
+
+    public static int simulate(Node node, int[] moveDictionary) {
+        return moveDictionarySimulate(node, moveDictionary);
     }
 
     /**
@@ -62,6 +68,70 @@ public class Simulate {
             else
                 return State.WHITE_QUEEN;
         }
+    }
+
+    private static int moveDictionarySimulate(Node node, int[] moveDictionary) {
+        final int TERMINATION_DEPTH = 20;
+        ArrayList<Action> actions = new ArrayList<>(Arrays.asList(node.getPossibleActions()));
+        int depth = 0;
+        State state = node.getState();
+        int color = node.getColour();
+        while(actions.size() != 0 && depth < TERMINATION_DEPTH) {
+            // Get the top actions from the move dictionary
+            int[][] queens = node.getColour() == State.BLACK_QUEEN ? node.getState().getQueens(State.BLACK_QUEEN) :
+                    node.getState().getQueens(State.WHITE_QUEEN);
+            PriorityQueue<int[]> topActions = getDictionaryMoves(queens, moveDictionary);
+            Action selected;
+            do {
+                int[] k = topActions.poll();
+                selected = new Action(k[1], k[2], k[3], k[4], k[5], k[6]);
+            } while (!actions.contains(selected));
+            state = new State(state, selected);
+            color = color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
+            actions = ActionGenerator.generateActions(state, color);
+            depth++;
+        }
+        double heuristicValue = Heuristics.bigPoppa(state, color);
+        if (heuristicValue > 0)
+            return State.BLACK_QUEEN;
+        else
+            return State.WHITE_QUEEN;
+    }
+
+    private static PriorityQueue<int[]> getDictionaryMoves(int[][] queens, int[] moveDictionary) {
+        /*
+            Gets the most common actions made from our move dictionary for the queens specified in the input array. The
+            priority queue sorts based on the action weight (how often it is used).
+         */
+        PriorityQueue<int[]> topActions = new PriorityQueue<>((o1, o2) -> (o2[0]) - (o1[0]));
+        for (int[] queen : queens) {
+            int x = queen[0];
+            int y = queen[1];
+            // Parse through all the possible actions
+            for (int i = 0; i < 100; i++) {
+                for (int j = 0; j < 100; j++) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(j < 10 ? "0" + j : j + "");
+                    sb.append(i < 10 ? "0" + i : i + "");
+                    sb.append(y == 0 ? "0" + x : x + y * 10);
+                    int index = Integer.parseInt(sb.toString());
+                    int num = moveDictionary[index];
+                    /*
+                        The index is formatted AANNOO where OO is the old index, NN is the new index, and AA is the
+                        index of the arrow shot. AS such, we need to extract and convert each number which is an int
+                        from 0 to 99 into an (x,y) coordinates
+                     */
+                    int oldX = index % 10;
+                    int oldY = (index % 100) / 10;
+                    int newX = (index % 1000) / 100;
+                    int newY = (index % 10000) / 1000;
+                    int arrowX = (index % 100000) / 10000;
+                    int arrowY = (index % 1000000) / 100000;
+                    topActions.offer(new int[]{num, oldX, oldY, newX, newY, arrowX, arrowY});
+                }
+            }
+        }
+        return topActions;
     }
 
     private static int boardControlHeuristic(State state, int colour) {

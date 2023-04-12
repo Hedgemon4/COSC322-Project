@@ -42,7 +42,7 @@ public class MonteCarloTree {
 
         boolean useMoveDictionary = root.getDepth() < 8;
         if (useMoveDictionary) {
-            selectedAction = getMoveDictionaryMove();
+            return getMoveDictionaryMove();
         }
         try {
             while (time.timeLeft()) {
@@ -59,7 +59,7 @@ public class MonteCarloTree {
                 // Create a list of runnable tasks that will be executed in separate threads
                 List<Callable<Integer>> callables = new ArrayList<>();
                 for (Node child : children)
-                    callables.add(() -> Simulate.simulate(child));
+                    callables.add(() -> Simulate.simulate(child, moveDictionary));
 
                 try {
                     // Execute all tasks. Will block until all threads have returned a value
