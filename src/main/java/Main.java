@@ -27,7 +27,7 @@ public class Main extends GamePlayer {
     private int colour;
 
     private MonteCarloTree monteCarloTree;
-    private final double cValue = 2.0;
+    private final double cValue = 1.8;
     private int depth = 0;
     private static int[] moveDictionary;
 
