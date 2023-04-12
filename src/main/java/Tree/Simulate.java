@@ -3,6 +3,8 @@ package Tree;
 import State.*;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Stack;
 
 public class Simulate {
 
@@ -13,7 +15,7 @@ public class Simulate {
      * @return The player that won. Either State.BLACK or State.WHITE
      */
     public static int simulate(Node node) {
-        return earlyTerminationPlayout(node);
+        return numberOfMovesSimulation(node);
     }
 
     /**
@@ -48,6 +50,62 @@ public class Simulate {
             state = new State(state, selectedAction);
             color = (color == State.BLACK_QUEEN) ? State.WHITE_QUEEN : State.BLACK_QUEEN;
             actions = ActionGenerator.generateActions(state, color);
+            i++;
+        }
+        if (i < TERMINATION_DEPTH)
+            return color == State.BLACK_QUEEN ? State.WHITE_QUEEN : State.BLACK_QUEEN;
+        else {
+            int blackControl = boardControlHeuristic(state, State.BLACK_QUEEN);
+            int whiteControl = boardControlHeuristic(state, State.WHITE_QUEEN);
+            if (blackControl == whiteControl)
+                return 0;
+            else if (blackControl > whiteControl)
+                return State.BLACK_QUEEN;
+            else
+                return State.WHITE_QUEEN;
+        }
+    }
+
+    private static int numberOfMovesSimulation(Node node) {
+        int i = 0;
+        final int TERMINATION_DEPTH = 20;
+        State state = new State(node.getState(), node.getAction());
+        int color = node.getColour();
+        int depth = node.getDepth();
+        ArrayList<Action> actions = ActionGenerator.generateActions(state, color, depth);
+        Action selectedAction;
+        while (actions.size() != 0 && i < TERMINATION_DEPTH) {
+            // Try this on 20 random moves
+            Stack<Integer> indices = new Stack<>();
+            int listLength = actions.size();
+            if (listLength > 100) {
+                Random random = new Random();
+                for (int k = 0; k < 20; k++) {
+                    indices.add(random.nextInt(listLength));
+                }
+            } else {
+                for (int k = 0; k < listLength; k++)
+                    indices.add(k);
+            }
+            // Calculate the number of moves for each action
+            int k = 0;
+            int maxScoreIndex = 0;
+            int maxNumberMoves = 0;
+            depth++;
+            color = (color == State.BLACK_QUEEN) ? State.WHITE_QUEEN : State.BLACK_QUEEN;
+            while (!indices.empty()) {
+                Action nextAction = actions.get(indices.pop());
+                State nextState = new State(state, nextAction);
+                int numMoves = ActionGenerator.generateNumberOfActions(nextState, color, depth);
+                if (numMoves > maxNumberMoves) {
+                    maxNumberMoves = numMoves;
+                    maxScoreIndex = k;
+                }
+                k++;
+            }
+            selectedAction = actions.get(maxScoreIndex);
+            state = new State(state, selectedAction);
+            actions = ActionGenerator.generateActions(state, color, depth);
             i++;
         }
         if (i < TERMINATION_DEPTH)
