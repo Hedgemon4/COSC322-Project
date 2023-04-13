@@ -1,3 +1,4 @@
+import NeuralNetwork.Model;
 import State.State;
 import Tree.MonteCarloTree;
 import ygraph.ai.smartfox.games.BaseGameGUI;
@@ -37,6 +38,10 @@ public class Main extends GamePlayer {
      * @param args Optional. If you want a bot, put a username and password (currently, any string would work), else don't put anything
      */
     public static void main(String[] args) {
+        // Load the model before anything else
+        // Load the same number of models as the number of threads
+        Model.init(Runtime.getRuntime().availableProcessors());
+
         GamePlayer player;
         if (args.length == 2)
             player = new Main(args[0] + "-" + ((int) (Math.random() * 1000)), args[1]);

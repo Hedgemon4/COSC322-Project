@@ -2,11 +2,12 @@ package State;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import static State.State.*;
 
-public class BitBoard implements Cloneable {
+public class BitBoard implements Cloneable, Serializable {
     private long whiteQueensTop;
     private long whiteQueensBottom;
     private long blackQueensTop;

@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
  
     <groupId>ubc.cosc322</groupId>
-    <artifactId>team-00</artifactId>
+    <artifactId>team-03</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
      
 
-    <name>COSC322-Team-00</name>
+    <name>COSC322-Team-03</name>
     <description>COSC 322 Game Player Project</description>
     <inceptionYear>2021</inceptionYear>
     
@@ -19,6 +19,23 @@
             <artifactId>ygraph-ai-smartfox-client</artifactId>
             <version>2.1</version>
             <type>jar</type>
+        </dependency>
+
+        <!--For Keras Model Usage-->
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>1.0.0-M2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-modelimport</artifactId>
+            <version>1.0.0-M2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-native-platform</artifactId>
+            <version>1.0.0-M2.1</version>
         </dependency>
     </dependencies>
 	
@@ -36,10 +53,9 @@
     <url>https:people.ok.uc.ca/yongg</url>
     <developers>
         <developer>
-            <id>Team-00</id>
-            <name>Team members</name>
-            <email></email>
-        </developer> 
+            <id>Team-03</id>
+            <name>Seth, Justin, Carlos, Dhruv</name>
+        </developer>
         <developer>
             <id>yg</id>
             <name>Yong Gao</name>
@@ -48,7 +64,17 @@
     </developers>
 
     <build>
- 
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
